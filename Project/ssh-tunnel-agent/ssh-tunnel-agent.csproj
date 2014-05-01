@@ -101,7 +101,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>powershell -Command "&amp; {&amp;'C:\Program Files (x86)\Git\bin\git.exe' --git-dir=\"$(SolutionDir)..\.git\" rev-parse --short HEAD | tee-object -variable rev; Get-Content \"$(ProjectDir)Properties\PREAssemblyInfo.cs\" | ForEach-Object { $_ -replace \"GIT_SHORTHASH\", \"$rev\" } | Set-Content \"$(ProjectDir)Properties\AssemblyInfo.cs\" }"</PreBuildEvent>
+    <PreBuildEvent>powershell -Command "&amp; {&amp;'$(DevEnvDir)..\..\..\Git\bin\git.exe' --git-dir=\"$(SolutionDir)..\.git\" rev-parse --short HEAD | tee-object -variable rev; Get-Content \"$(ProjectDir)Properties\PREAssemblyInfo.cs\" | ForEach-Object { $_ -replace \"GIT_SHORTHASH\", \"$rev\" } | Set-Content \"$(ProjectDir)Properties\AssemblyInfo.cs\" }"</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
