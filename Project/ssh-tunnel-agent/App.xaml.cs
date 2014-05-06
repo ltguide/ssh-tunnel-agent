@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace ssh_tunnel_agent {
     /// <summary>
@@ -16,12 +13,18 @@ namespace ssh_tunnel_agent {
         private void onStartup(object sender, StartupEventArgs e) {
             AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
 
-            upgradeFile(@"ssh-tunnel-agent-plink.exe", @"Release 0.63");
+            try {
+                upgradeFile("ssh-tunnel-agent-plink.exe", "Release 0.63");
+            }
+            catch (Exception ex) {
+                MessageBox.Show("Failed to write ssh-tunnel-agent-plink.exe: " + ex.Message, "SSH Tunnel Agent", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            }
 
             try {
-                FindResource("MyNotifyIcon");
+                FindResource("NotifyIcon");
             }
             catch (Exception) {
+                MessageBox.Show("Unable to load Hardcodet.Wpf.TaskbarNotification.dll", "SSH Tunnel Agent", MessageBoxButton.OK, MessageBoxImage.Error);
                 Application.Current.Shutdown();
             }
         }
@@ -41,7 +44,7 @@ namespace ssh_tunnel_agent {
         public Assembly CurrentDomain_AssemblyResolve(Object sender, ResolveEventArgs args) {
             string name = args.Name.Substring(0, args.Name.IndexOf(',')) + @".dll";
 
-            if (name != @"Hardcodet.Wpf.TaskbarNotification.dll")
+            if (name != "Hardcodet.Wpf.TaskbarNotification.dll")
                 return null;
 
             using (Stream resource = getEmbedded(name)) {
@@ -55,7 +58,7 @@ namespace ssh_tunnel_agent {
         }
 
         private Stream getEmbedded(string name) {
-            return Assembly.GetExecutingAssembly().GetManifestResourceStream(@"ssh_tunnel_agent.Embedded." + name);
+            return Assembly.GetExecutingAssembly().GetManifestResourceStream("ssh_tunnel_agent.Embedded." + name);
         }
     }
 }
