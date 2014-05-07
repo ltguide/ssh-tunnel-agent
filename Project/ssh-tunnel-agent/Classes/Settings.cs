@@ -19,16 +19,16 @@ namespace ssh_tunnel_agent {
         }
 
 
-        public static void Add(String key, String value) {
+        public static void Add(string key, string value) {
             Settings.Remove(key);
             instance.config.AppSettings.Settings.Add(key, value);
         }
 
-        public static void Remove(String key) {
+        public static void Remove(string key) {
             instance.config.AppSettings.Settings.Remove(key);
         }
 
-        public static String Get(String key) {
+        public static string Get(string key) {
             try {
                 return instance.config.AppSettings.Settings[key].ToString();
             }

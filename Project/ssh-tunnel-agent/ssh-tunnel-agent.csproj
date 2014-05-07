@@ -81,6 +81,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Classes\TunnelStatus.cs" />
+    <Compile Include="Classes\NotifyPropertyChanged.cs" />
     <Compile Include="Classes\RelayCommand.cs" />
     <Compile Include="Classes\NotifyIconViewModel.cs" />
     <Compile Include="Classes\Settings.cs" />
@@ -90,6 +92,8 @@
     <Compile Include="Controls\TrayToolTip.xaml.cs">
       <DependentUpon>TrayToolTip.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\TunnelStateToImageSourceConverter.cs" />
+    <Compile Include="Data\Tunnel.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -132,6 +136,14 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Embedded\ssh-tunnel-agent-plink.exe" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\tunnel.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\TunnelState_CONNECTED.png" />
+    <Resource Include="Assets\TunnelState_ERROR.png" />
+    <Resource Include="Assets\TunnelState_DISCONNECTED.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

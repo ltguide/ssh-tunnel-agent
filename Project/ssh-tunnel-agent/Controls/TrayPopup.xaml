@@ -4,7 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ssh_tunnel_agent" 
-             mc:Ignorable="d">
+             mc:Ignorable="d" ScrollViewer.CanContentScroll="True">
+    <!--<UserControl.Resources>
+        <local:TunnelStateToImageSourceConverter x:Key="TunnelStateToImageSourceConverter" />
+    </UserControl.Resources>-->
     <Border
             Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" 
             BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" 
@@ -17,10 +20,37 @@
         <StackPanel>
             <TextBlock FontWeight="Bold" Foreground="{DynamicResource {x:Static SystemColors.MenuTextBrushKey}}">SSH Tunnel Agent</TextBlock>
             <Line Stroke="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" Stretch="Fill" X2="1" Margin="0,1,0,3" />
+            <ListView ItemsSource="{Binding Path=Tunnels}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image Source="{Binding Status,Converter={local:TunnelStateToImageSourceConverter}}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Session" DisplayMemberBinding="{Binding Session}" />
+                    </GridView>
+                </ListView.View>
+            </ListView>
+            <DataGrid ItemsSource="{Binding Path=Tunnels}" AutoGenerateColumns="False" GridLinesVisibility="None" BorderThickness="0" HeadersVisibility="Column" SelectionMode="Single" SelectionUnit="Cell">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn CanUserReorder="False" CanUserResize="False" IsReadOnly="True">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding Status,Converter={local:TunnelStateToImageSourceConverter}}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Binding="{Binding Session}" Header="Session" CanUserReorder="False" CanUserResize="False" IsReadOnly="True" MinWidth="90"  />
+                </DataGrid.Columns>
+            </DataGrid>
+            <!--
             <TextBlock>
-                <!--<TextBlock.InputBindings>
+                <TextBlock.InputBindings>
                     <MouseBinding Command="local:Command.Exit" MouseAction="LeftClick" />
-                </TextBlock.InputBindings>-->
+                </TextBlock.InputBindings>
                 <Hyperlink Command="{Binding ExitApplicationCommand}" TextDecorations="None" Foreground="{DynamicResource {x:Static SystemColors.MenuTextBrushKey}}" >moo</Hyperlink>
                 Left/Double-click to control tunnels
                 <LineBreak />
@@ -33,9 +63,12 @@
                     </ControlTemplate>
                 </Button.Template>
                 <TextBlock Text="Lorem Ipsum"/>
-            </Button>
+            </Button> -->
             <Button Command="{Binding TestCommand}">moo</Button>
             <TextBlock Text="{Binding PhoneNumber}" />
+            <Image Source="../Assets/TunnelState_CONNECTED.png" Height="12" Width="18" />
+            <Image Source="../Assets/TunnelState_DISCONNECTED.png" Height="12" Width="18" />
+            <Image Source="../Assets/TunnelState_ERROR.png" Height="12" Width="18" />
         </StackPanel>
     </Border>
 </UserControl>

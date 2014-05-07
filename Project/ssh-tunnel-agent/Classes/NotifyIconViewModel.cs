@@ -1,25 +1,18 @@
-﻿using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using ssh_tunnel_agent.Data;
+using System;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
 
 namespace ssh_tunnel_agent {
-    public class NotifyIconViewModel : INotifyPropertyChanged {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "") {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-
+    public class NotifyIconViewModel : NotifyPropertyChangedBase {
         private RelayCommand _exitApplicationCommand = new RelayCommand((param) => Application.Current.Shutdown());
         public ICommand ExitApplicationCommand {
             get { return _exitApplicationCommand; }
         }
 
-        private String _connectedTunnels = "No tunnels connected.";
-        public String ConnectedTunnels {
+        private string _connectedTunnels = "No tunnels connected.";
+        public string ConnectedTunnels {
             get { return _connectedTunnels; }
             set {
                 _connectedTunnels = value;
@@ -27,6 +20,20 @@ namespace ssh_tunnel_agent {
             }
         }
 
+        private ObservableCollection<Tunnel> _tunnels;
+        public ObservableCollection<Tunnel> Tunnels {
+            get {
+                if (_tunnels == null) {
+                    _tunnels = new ObservableCollection<Tunnel>();
+                    _tunnels.Add(new Tunnel("x", TunnelStatus.CONNECTED));
+                }
+                return _tunnels;
+            }
+            set {
+                _tunnels = value;
+                NotifyPropertyChanged();
+            }
+        }
 
 
 
@@ -54,6 +61,8 @@ namespace ssh_tunnel_agent {
         private void changePhoneNumber() {
             PhoneNumber++;
             ConnectedTunnels = PhoneNumber + " connected tunnels\nwoot";
+            _tunnels[0].Status = _tunnels[0].Status == TunnelStatus.DISCONNECTED ? TunnelStatus.CONNECTED : TunnelStatus.DISCONNECTED;
+            _tunnels.Add(new Tunnel(_tunnels[_tunnels.Count - 1].Session + PhoneNumber.ToString(), TunnelStatus.ERROR));
         }
     }
 }
