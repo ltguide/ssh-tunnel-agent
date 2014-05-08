@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ssh_tunnel_agent.Data {
-    public class Tunnel : NotifyPropertyChangedBase {
-        public string Session { get; set; }
+    public class Session : NotifyPropertyChangedBase {
+        public string Name { get; set; }
 
-        private TunnelStatus _status;
-        public TunnelStatus Status {
+        private SessionStatus _status;
+        public SessionStatus Status {
             get { return _status; }
             set {
                 _status = value;
@@ -17,8 +17,8 @@ namespace ssh_tunnel_agent.Data {
             }
         }
 
-        public Tunnel(string Session, TunnelStatus Status) {
-            this.Session = Session;
+        public Session(string Name, SessionStatus Status) {
+            this.Name = Name;
             this.Status = Status;
         }
     }

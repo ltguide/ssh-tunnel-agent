@@ -17,12 +17,12 @@
             <TextBlock FontWeight="Bold" Foreground="{DynamicResource {x:Static SystemColors.MenuTextBrushKey}}">SSH Tunnel Agent</TextBlock>
             <Line Stroke="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" Stretch="Fill" X2="1" Margin="0,1,0,3" />
             <TextBlock>
-                Left/Double-click to control tunnels
+                Left/Double-click to control sessions
                 <LineBreak />
                 Right-click to Configure or Exit
             </TextBlock>
             <Line Stroke="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" Stretch="Fill" X2="1" Margin="0,3,0,1" />
-            <TextBlock Text="{Binding ConnectedTunnels}" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+            <TextBlock Text="{Binding ConnectedSessions}" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
         </StackPanel>
     </Border>
 </UserControl>

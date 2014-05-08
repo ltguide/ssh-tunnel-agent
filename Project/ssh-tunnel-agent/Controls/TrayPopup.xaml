@@ -4,10 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ssh_tunnel_agent" 
-             mc:Ignorable="d" ScrollViewer.CanContentScroll="True">
-    <!--<UserControl.Resources>
-        <local:TunnelStateToImageSourceConverter x:Key="TunnelStateToImageSourceConverter" />
-    </UserControl.Resources>-->
+             mc:Ignorable="d" ScrollViewer.CanContentScroll="True" IsVisibleChanged="UserControl_IsVisibleChanged">
     <Border
             Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" 
             BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" 
@@ -20,55 +17,48 @@
         <StackPanel>
             <TextBlock FontWeight="Bold" Foreground="{DynamicResource {x:Static SystemColors.MenuTextBrushKey}}">SSH Tunnel Agent</TextBlock>
             <Line Stroke="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" Stretch="Fill" X2="1" Margin="0,1,0,3" />
-            <ListView ItemsSource="{Binding Path=Tunnels}">
+            <TextBlock Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}">
+                Right/Double-click Session to control
+            </TextBlock>
+            <Line Stroke="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" Stretch="Fill" X2="1" Margin="0,3,0,1" />
+            <ListView Name="listSessions" ItemsSource="{Binding Path=Sessions}" TargetUpdated="listSessions_TargetUpdated" BorderThickness="1" MouseDoubleClick="listSessions_MouseDoubleClick" Margin="0,3">
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="{Binding PlacementTarget.SelectedItem.Status, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Converter={local:SessionStatusToConnectHeaderConverter}}" Command="{Binding TriggerSessionCommand}" CommandParameter="{Binding Path=PlacementTarget.SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}" />
+                        <Separator />
+                        <MenuItem Header="Configure" Command="{Binding ConfigureSessionCommand}" CommandParameter="{Binding Path=PlacementTarget.SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}" />
+                    </ContextMenu>
+                </ListView.ContextMenu>
+                <ListView.Style>
+                    <Style TargetType="ListView">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Path=Sessions.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.Style>
                 <ListView.View>
                     <GridView>
+                        <GridView.ColumnHeaderContainerStyle>
+                            <Style TargetType="{x:Type GridViewColumnHeader}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </Style>
+                        </GridView.ColumnHeaderContainerStyle>
                         <GridViewColumn>
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Image Source="{Binding Status,Converter={local:TunnelStateToImageSourceConverter}}" />
+                                    <Image Source="{Binding Status, Converter={local:SessionStatusToImageSourceConverter}}" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Session" DisplayMemberBinding="{Binding Session}" />
+                        <GridViewColumn DisplayMemberBinding="{Binding Name, NotifyOnTargetUpdated=True}" />
                     </GridView>
                 </ListView.View>
             </ListView>
-            <DataGrid ItemsSource="{Binding Path=Tunnels}" AutoGenerateColumns="False" GridLinesVisibility="None" BorderThickness="0" HeadersVisibility="Column" SelectionMode="Single" SelectionUnit="Cell">
-                <DataGrid.Columns>
-                    <DataGridTemplateColumn CanUserReorder="False" CanUserResize="False" IsReadOnly="True">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Image Source="{Binding Status,Converter={local:TunnelStateToImageSourceConverter}}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding Session}" Header="Session" CanUserReorder="False" CanUserResize="False" IsReadOnly="True" MinWidth="90"  />
-                </DataGrid.Columns>
-            </DataGrid>
-            <!--
             <TextBlock>
-                <TextBlock.InputBindings>
-                    <MouseBinding Command="local:Command.Exit" MouseAction="LeftClick" />
-                </TextBlock.InputBindings>
-                <Hyperlink Command="{Binding ExitApplicationCommand}" TextDecorations="None" Foreground="{DynamicResource {x:Static SystemColors.MenuTextBrushKey}}" >moo</Hyperlink>
-                Left/Double-click to control tunnels
-                <LineBreak />
-                Right-click to Configure or Exit
+                <Hyperlink Command="{Binding TestCommand}">Add session</Hyperlink>
             </TextBlock>
-            <Button Command="{Binding ExitApplicationCommand}">
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <ContentPresenter />
-                    </ControlTemplate>
-                </Button.Template>
-                <TextBlock Text="Lorem Ipsum"/>
-            </Button> -->
-            <Button Command="{Binding TestCommand}">moo</Button>
-            <TextBlock Text="{Binding PhoneNumber}" />
-            <Image Source="../Assets/TunnelState_CONNECTED.png" Height="12" Width="18" />
-            <Image Source="../Assets/TunnelState_DISCONNECTED.png" Height="12" Width="18" />
-            <Image Source="../Assets/TunnelState_ERROR.png" Height="12" Width="18" />
         </StackPanel>
     </Border>
 </UserControl>
