@@ -1,6 +1,8 @@
 ﻿using ssh_tunnel_agent.Data;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
 
@@ -11,11 +13,36 @@ namespace ssh_tunnel_agent {
             get { return _exitApplicationCommand; }
         }
 
-        private RelayCommand _configureApplicationCommand = new RelayCommand((param) => {
-            System.Diagnostics.Debug.WriteLine("application configure");
-        });
-        public ICommand ConfigureApplicationCommand {
-            get { return _configureApplicationCommand; }
+        private RelayCommand _autoStartApplicationCommand;
+        public ICommand AutoStartApplicationCommand {
+            get {
+                if (_autoStartApplicationCommand == null)
+                    _autoStartApplicationCommand = new RelayCommand((param) => {
+                        AutoStartApplication = !AutoStartApplication;
+
+                        if (AutoStartApplication) {
+                            Debug.WriteLine("add to HKCU Run");
+                        }
+                        else {
+                            Debug.WriteLine("remove from HKCU Run");
+                        }
+                    });
+
+                return _autoStartApplicationCommand;
+            }
+        }
+
+        private bool _autoStartApplication = Settings.Get<bool>("AutoStartApplication");
+        public bool AutoStartApplication {
+            set {
+                _autoStartApplication = value;
+                Settings.Set("AutoStartApplication", value);
+                Settings.Save();
+                NotifyPropertyChanged();
+            }
+            get {
+                return _autoStartApplication;
+            }
         }
 
         private RelayCommand _triggerSessionCommand;
@@ -28,22 +55,9 @@ namespace ssh_tunnel_agent {
             }
         }
 
-        private int tmpConnectedSessions = 0;
         private void triggerSession(object param) {
-            Session session = (Session)param;
-
-            System.Diagnostics.Debug.WriteLine("toggle " + session.Name + " which is currently " + session.Status);
-
-            if (session.Status == SessionStatus.CONNECTED) {
-                session.Status = SessionStatus.DISCONNECTED;
-                tmpConnectedSessions--;
-            }
-            else {
-                session.Status = SessionStatus.CONNECTED;
-                tmpConnectedSessions++;
-            }
-
-            ConnectedSessions = tmpConnectedSessions + " connected tunnels\nnew line";
+            ((Session)param).ToggleConnection();
+            ConnectedSessions = null;
         }
 
         private RelayCommand _configureSessionCommand;
@@ -64,25 +78,38 @@ namespace ssh_tunnel_agent {
 
         private string _connectedSessions = "No sessions connected.";
         public string ConnectedSessions {
-            get { return _connectedSessions; }
             set {
-                _connectedSessions = value;
+                if (value == null) {
+                    StringBuilder sb = new StringBuilder();
+
+                    foreach (Session session in Sessions)
+                        if (session.Status == SessionStatus.CONNECTED && !session.SendCommands)
+                            sb.AppendLine(session.TunnelsToString());
+
+                    _connectedSessions = sb.Length > 0 ? sb.ToString(0, sb.Length - Environment.NewLine.Length) : "No sessions connected.";
+                }
+                else
+                    _connectedSessions = value;
+
                 NotifyPropertyChanged();
             }
+            get { return _connectedSessions; }
+
         }
 
         private ObservableCollection<Session> _sessions;
         public ObservableCollection<Session> Sessions {
+            set {
+                _sessions = value;
+                NotifyPropertyChanged();
+            }
             get {
                 if (_sessions == null)
                     _sessions = new ObservableCollection<Session>();
 
                 return _sessions;
             }
-            set {
-                _sessions = value;
-                NotifyPropertyChanged();
-            }
+
         }
 
 
@@ -98,8 +125,12 @@ namespace ssh_tunnel_agent {
                         x = Sessions[Sessions.Count - 1].Name;
                         TriggerSessionCommand.Execute(Sessions[0]);
                     }
-                    _sessions.Add(new Session(x + Sessions.Count.ToString(), SessionStatus.ERROR));
+                    _sessions.Add(new Session() {
+                        Name = x + Sessions.Count.ToString(),
+                        Status = SessionStatus.ERROR
+                    });
                 });
+
                 return _testCommand;
             }
         }

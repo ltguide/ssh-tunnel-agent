@@ -18,7 +18,9 @@
         </tb:TaskbarIcon.TrayPopup>
         <tb:TaskbarIcon.ContextMenu>
             <ContextMenu>
-                <MenuItem Header="Configure" Command="{Binding ConfigureApplicationCommand}" />
+                <MenuItem Header="Configure">
+                    <MenuItem Header="Start when you logon" IsChecked="{Binding AutoStartApplication}" Command="{Binding AutoStartApplicationCommand}" />
+                </MenuItem>
                 <Separator />
                 <MenuItem Header="Exit" Command="{Binding ExitApplicationCommand}" />
             </ContextMenu>

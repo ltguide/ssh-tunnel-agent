@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace ssh_tunnel_agent {
     /// <summary>
@@ -14,6 +13,8 @@ namespace ssh_tunnel_agent {
             AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
 
             try {
+                //check for plink.exe at right version, delete ours
+                //else
                 upgradeFile("ssh-tunnel-agent-plink.exe", "Release 0.63");
             }
             catch (Exception ex) {
