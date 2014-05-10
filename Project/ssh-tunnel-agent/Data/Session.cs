@@ -1,19 +1,22 @@
 ﻿
+using ssh_tunnel_agent.Classes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+
 namespace ssh_tunnel_agent.Data {
-    public class Session : NotifyPropertyChangedBase {
-        public string Name { get; set; }
-        /*private string _name;
+    public class Session : EditableObject<Session> {
+        private ViewModel viewModel;
+
+        private string _name;
         public string Name {
             get { return _name; }
             set {
                 _name = value;
                 NotifyPropertyChanged();
             }
-        }*/
+        }
 
         private SessionStatus _status;
         public SessionStatus Status {
@@ -49,6 +52,11 @@ namespace ssh_tunnel_agent.Data {
             get { return _tunnels; }
         }
 
+        public Session(ViewModel viewModel)
+            : this() {
+            this.viewModel = viewModel;
+        }
+
         public Session() {
             Name = String.Empty;
             Status = SessionStatus.DISCONNECTED;
@@ -71,9 +79,9 @@ namespace ssh_tunnel_agent.Data {
 
 
 
-            Host = "itweb";
-            Tunnels.Add(new Tunnel() { Type = TunnelType.DYNAMIC, ListenIP = "0.0.0.0", ListenPort = 8080 });
-            Tunnels.Add(new Tunnel() { Type = TunnelType.LOCAL, ListenIP = "0.0.0.0", ListenPort = 4444, Host = "10.5.205.235", Port = 3389 });
+                        Host = "itweb";
+            //            Tunnels.Add(new Tunnel() { Type = TunnelType.DYNAMIC, ListenIP = "0.0.0.0", ListenPort = 8080 });
+            //            Tunnels.Add(new Tunnel() { Type = TunnelType.LOCAL, ListenIP = "0.0.0.0", ListenPort = 4444, Host = "10.5.205.235", Port = 3389 });
         }
 
         private string getArguments() {
@@ -128,11 +136,15 @@ namespace ssh_tunnel_agent.Data {
             Status = SessionStatus.CONNECTED;
             Debug.WriteLine("connect: " + Name);
             Debug.WriteLine(getArguments());
+
+            viewModel.ConnectedSessions = null;
         }
 
         public void Disconnect() {
             Status = SessionStatus.DISCONNECTED;
             Debug.WriteLine("disconnect: " + Name);
+
+            viewModel.ConnectedSessions = null;
         }
 
         internal string TunnelsToString() {

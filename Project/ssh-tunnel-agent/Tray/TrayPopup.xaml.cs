@@ -1,9 +1,8 @@
 ﻿using ssh_tunnel_agent.Data;
-using System;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace ssh_tunnel_agent {
+namespace ssh_tunnel_agent.Tray {
     /// <summary>
     /// Interaction logic for TrayPopup.xaml
     /// </summary>
@@ -34,7 +33,7 @@ namespace ssh_tunnel_agent {
             if (item == null)
                 return;
 
-            NotifyIconViewModel vm = DataContext as NotifyIconViewModel;
+            ViewModel vm = DataContext as ViewModel;
             vm.TriggerSessionCommand.Execute(item);
         }
 

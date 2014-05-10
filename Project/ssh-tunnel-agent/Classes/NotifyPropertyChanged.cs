@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 
-namespace ssh_tunnel_agent {
+namespace ssh_tunnel_agent.Classes {
     public class NotifyPropertyChangedBase : INotifyPropertyChanged {
         public event PropertyChangedEventHandler PropertyChanged;
 

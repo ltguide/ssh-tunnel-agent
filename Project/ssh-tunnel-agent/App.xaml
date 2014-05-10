@@ -6,7 +6,8 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Assets/NotifyIcon.xaml" />
+                <ResourceDictionary Source="/Tray/TrayIcon.xaml" />
+                <ResourceDictionary Source="/DefaultStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

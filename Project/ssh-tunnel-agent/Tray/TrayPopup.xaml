@@ -1,10 +1,11 @@
-﻿<UserControl x:Class="ssh_tunnel_agent.TrayPopup"
+﻿<UserControl x:Class="ssh_tunnel_agent.Tray.TrayPopup"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:ssh_tunnel_agent" 
-             mc:Ignorable="d" ScrollViewer.CanContentScroll="True" IsVisibleChanged="UserControl_IsVisibleChanged">
+             xmlns:localTray="clr-namespace:ssh_tunnel_agent.Tray" 
+             mc:Ignorable="d" 
+             IsVisibleChanged="UserControl_IsVisibleChanged">
     <Border
             Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" 
             BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" 
@@ -24,7 +25,7 @@
             <ListView Name="listSessions" ItemsSource="{Binding Path=Sessions}" TargetUpdated="listSessions_TargetUpdated" BorderThickness="1" MouseDoubleClick="listSessions_MouseDoubleClick" Margin="0,3">
                 <ListView.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="{Binding PlacementTarget.SelectedItem.Status, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Converter={local:SessionStatusToConnectHeaderConverter}}" Command="{Binding TriggerSessionCommand}" CommandParameter="{Binding Path=PlacementTarget.SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}" />
+                        <MenuItem Header="{Binding PlacementTarget.SelectedItem.Status, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Converter={localTray:SessionStatusToContextMenuHeaderConverter}}" Command="{Binding TriggerSessionCommand}" CommandParameter="{Binding Path=PlacementTarget.SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}" />
                         <Separator />
                         <MenuItem Header="Configure" Command="{Binding ConfigureSessionCommand}" CommandParameter="{Binding Path=PlacementTarget.SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}" />
                     </ContextMenu>
@@ -48,7 +49,7 @@
                         <GridViewColumn>
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Image Source="{Binding Status, Converter={local:SessionStatusToImageSourceConverter}}" />
+                                    <Image Source="{Binding Status, Converter={localTray:SessionStatusToImageSourceConverter}}" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -57,7 +58,7 @@
                 </ListView.View>
             </ListView>
             <TextBlock>
-                <Hyperlink Command="{Binding TestCommand}">Add session</Hyperlink>
+                <Hyperlink Command="{Binding ConfigureSessionCommand}">Add session</Hyperlink>
             </TextBlock>
         </StackPanel>
     </Border>

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace ssh_tunnel_agent {
+namespace ssh_tunnel_agent.Classes {
     public class RelayCommand : ICommand {
         readonly Action<object> _execute;
         readonly Predicate<object> _canExecute;

@@ -4,13 +4,21 @@ using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Markup;
 
-namespace ssh_tunnel_agent {
+namespace ssh_tunnel_agent.Tray {
     [ValueConversion(typeof(SessionStatus), typeof(string))]
-    public class SessionStatusToImageSourceConverter : MarkupExtension, IValueConverter {
-        public SessionStatusToImageSourceConverter() { }
+    public class SessionStatusToContextMenuHeaderConverter : MarkupExtension, IValueConverter {
+        public SessionStatusToContextMenuHeaderConverter() { }
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            return "/Assets/SessionStatus_" + value.ToString() + ".png";
+            switch ((SessionStatus)value) {
+                case SessionStatus.CONNECTED:
+                    return "Disconnect";
+                case SessionStatus.ERROR:
+                    return "Reconnect";
+                case SessionStatus.DISCONNECTED:
+                default:
+                    return "Connect";
+            }
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {

@@ -22,7 +22,7 @@ namespace ssh_tunnel_agent {
             }
 
             try {
-                FindResource("NotifyIcon");
+                FindResource("TrayIcon");
             }
             catch (Exception) {
                 MessageBox.Show("Unable to load Hardcodet.Wpf.TaskbarNotification.dll", "SSH Tunnel Agent", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -45,7 +45,7 @@ namespace ssh_tunnel_agent {
         public Assembly CurrentDomain_AssemblyResolve(Object sender, ResolveEventArgs args) {
             string name = args.Name.Substring(0, args.Name.IndexOf(',')) + @".dll";
 
-            if (name != "Hardcodet.Wpf.TaskbarNotification.dll")
+            if (name != "Hardcodet.Wpf.TaskbarNotification.dll" && name != "Newtonsoft.Json.dll")
                 return null;
 
             using (Stream resource = getEmbedded(name)) {
