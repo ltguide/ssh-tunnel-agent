@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:localTray="clr-namespace:ssh_tunnel_agent.Tray" 
              mc:Ignorable="d" 
-             x:Name="x"
+             x:Name="MyControl"
              Loaded="UserControl_Loaded">
     <UserControl.Resources>
         <Storyboard x:Key="HighlightCloseButton">
@@ -52,8 +52,8 @@
                 <DropShadowEffect Opacity="0.8"/>
             </Border.Effect>
             <StackPanel>
-                <TextBlock Text="{Binding ElementName=x,Path=PopupTitle}" />
-                <Grid DataContext="{Binding ElementName=x}">
+                <TextBlock Text="{Binding ElementName=MyControl,Path=PopupTitle}" />
+                <Grid DataContext="{Binding ElementName=MyControl}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
                         <ColumnDefinition />
@@ -73,7 +73,7 @@
                     <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=Session.Username}" />
                 </Grid>
                 <DockPanel HorizontalAlignment="Right">
-                    <Button Content="OK" Command="{Binding SessionOkCommand}" CommandParameter="{Binding ElementName=x,Path=Session}" />
+                    <Button Content="OK" Command="{Binding SessionOkCommand}" CommandParameter="{Binding ElementName=MyControl,Path=Session}" />
                     <Button Content="Cancel" Command="{Binding SessionCancelCommand}" />
                 </DockPanel>
             </StackPanel>
