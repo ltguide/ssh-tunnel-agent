@@ -5,8 +5,8 @@ namespace ssh_tunnel_agent.Config {
         public SettingsSection() { }
 
         [ConfigurationProperty("Sessions")]
-        public ConfigurationTextElement Sessions {
-            get { return (ConfigurationTextElement)(this["Sessions"]); }
+        public TextConfigurationElement Sessions {
+            get { return (TextConfigurationElement)(this["Sessions"]); }
             set { this["Sessions"] = value; }
         }
 

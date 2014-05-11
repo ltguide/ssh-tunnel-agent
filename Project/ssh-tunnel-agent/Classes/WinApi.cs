@@ -5,6 +5,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Interop;
 
 namespace ssh_tunnel_agent.Classes {
+    // this is a hack since TaskbarIcon does not focus on CustomBalloon so TextBox's are fail
     public static class WinApi {
         /// <summary>
         /// Gives focus to a given window.

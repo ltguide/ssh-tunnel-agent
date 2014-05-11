@@ -15,7 +15,7 @@ namespace ssh_tunnel_agent {
             try {
                 //check for plink.exe at right version, delete ours
                 //else
-                upgradeFile("ssh-tunnel-agent-plink.exe", "Release 0.63");
+                //upgradeFile("ssh-tunnel-agent-plink.exe", "Release 0.63");
             }
             catch (Exception ex) {
                 MessageBox.Show("Failed to write ssh-tunnel-agent-plink.exe: " + ex.Message, "SSH Tunnel Agent", MessageBoxButton.OK, MessageBoxImage.Exclamation);

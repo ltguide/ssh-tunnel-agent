@@ -3,9 +3,10 @@ using System.ComponentModel;
 using System.Reflection;
 
 namespace ssh_tunnel_agent.Classes {
+    // based on http://indepthdev.azurewebsites.net/?p=73
     public abstract class EditableObject<T> : NotifyPropertyChangedBase, IEditableObject {
         private T Cache { get; set; }
-        private bool isEditing;
+        internal bool isEditing;
 
         public void BeginEdit() {
             if (isEditing)

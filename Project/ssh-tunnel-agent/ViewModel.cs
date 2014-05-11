@@ -14,6 +14,7 @@ using System.Windows.Input;
 
 namespace ssh_tunnel_agent {
     public class ViewModel : NotifyPropertyChangedBase {
+
         private TaskbarIcon _trayIcon;
         public TaskbarIcon TrayIcon {
             get {
@@ -21,30 +22,6 @@ namespace ssh_tunnel_agent {
                     _trayIcon = (TaskbarIcon)Application.Current.FindResource("TrayIcon");
 
                 return _trayIcon;
-            }
-        }
-
-        private RelayCommand _exitApplicationCommand = new RelayCommand((param) => Application.Current.Shutdown());
-        public ICommand ExitApplicationCommand {
-            get { return _exitApplicationCommand; }
-        }
-
-        private RelayCommand _autoStartApplicationCommand;
-        public ICommand AutoStartApplicationCommand {
-            get {
-                if (_autoStartApplicationCommand == null)
-                    _autoStartApplicationCommand = new RelayCommand((param) => {
-                        AutoStartApplication = !AutoStartApplication;
-
-                        if (AutoStartApplication) {
-                            Debug.WriteLine("add to HKCU Run");
-                        }
-                        else {
-                            Debug.WriteLine("remove from HKCU Run");
-                        }
-                    });
-
-                return _autoStartApplicationCommand;
             }
         }
 
@@ -61,63 +38,122 @@ namespace ssh_tunnel_agent {
             }
         }
 
-        private RelayCommand _triggerSessionCommand;
-        public ICommand TriggerSessionCommand {
+        private RelayCommand _exitApplicationCommand;
+        public RelayCommand ExitApplicationCommand {
             get {
-                if (_triggerSessionCommand == null)
-                    _triggerSessionCommand = new RelayCommand((param) => {
-                        ((Session)param).ToggleConnection();
-
-                        //ConnectedSessions = null; // this should be done from Session
-                    });
-
-                return _triggerSessionCommand;
+                return _exitApplicationCommand ?? (
+                    _exitApplicationCommand = new RelayCommand(
+                        () => Application.Current.Shutdown()
+                    ));
             }
         }
 
-        private RelayCommand _configureSessionCommand;
-        public ICommand ConfigureSessionCommand {
+        private RelayCommand _autoStartApplicationCommand;
+        public ICommand AutoStartApplicationCommand {
             get {
-                if (_configureSessionCommand == null)
-                    _configureSessionCommand = new RelayCommand(
-                        (param) => {
-                            TrayIcon.ShowCustomBalloon(new TrayPopupSession(this, param as Session), PopupAnimation.Slide, null);
+                return _autoStartApplicationCommand ?? (
+                    _autoStartApplicationCommand = new RelayCommand(
+                        () => {
+                            AutoStartApplication = !AutoStartApplication;
+
+                            if (AutoStartApplication) {
+                                Debug.WriteLine("add to HKCU Run");
+                            }
+                            else {
+                                Debug.WriteLine("remove from HKCU Run");
+                            }
+                        }
+                    ));
+            }
+        }
+
+        private RelayCommand<Session> _triggerSessionCommand;
+        public RelayCommand<Session> TriggerSessionCommand {
+            get {
+                return _triggerSessionCommand ?? (
+                    _triggerSessionCommand = new RelayCommand<Session>(
+                        (session) => session.ToggleConnection(),
+                        (session) => TrayIcon.CustomBalloon == null
+                    ));
+            }
+        }
+
+        private RelayCommand<Session> _configureSessionCommand;
+        public RelayCommand<Session> ConfigureSessionCommand {
+            get {
+                return _configureSessionCommand ?? (
+                    _configureSessionCommand = new RelayCommand<Session>(
+                        (session) => {
+                            if (session == null)
+                                session = new Session(this);
+                            else
+                                session.BeginEdit();
+
+                            TrayIcon.ShowCustomBalloon(new TrayPopupSession(session), PopupAnimation.Slide, null);
                         },
-                        (param) => {
+                        (session) => {
                             if (TrayIcon.CustomBalloon != null)
                                 return false;
 
-                            Session session = param as Session;
                             if (session != null && session.Status == SessionStatus.CONNECTED)
                                 return false;
 
                             return true;
                         }
-                    );
-
-                return _configureSessionCommand;
+                    ));
             }
         }
 
+        private RelayCommand<Session> _sessionOkCommand;
+        public RelayCommand<Session> SessionOkCommand {
+            get {
+                return _sessionOkCommand ?? (
+                    _sessionOkCommand = new RelayCommand<Session>(
+                        (session) => {
+                            if (session.isEditing)
+                                session.EndEdit();
+                            else
+                                Sessions.Add(session);
+
+                            SaveSessions();
+
+                            TrayIcon.CloseBalloon();
+                        },
+                        (session) => session != null && session.Name != "" && session.Host != ""
+                    ));
+            }
+        }
+
+        private RelayCommand _sessionCancelCommand;
+        public RelayCommand SessionCancelCommand {
+            get {
+                return _sessionCancelCommand ?? (
+                    _sessionCancelCommand = new RelayCommand(
+                        () => TrayIcon.CloseBalloon()
+                    ));
+            }
+        }
+
+        private string _connectedSessions;
         public string ConnectedSessions {
             set {
+                _connectedSessions = value;
                 NotifyPropertyChanged();
             }
             get {
-                StringBuilder sb = new StringBuilder();
+                if (_connectedSessions == null) {
+                    StringBuilder sb = new StringBuilder();
 
-                foreach (Session session in Sessions)
-                    if (session.Status == SessionStatus.CONNECTED && !session.SendCommands)
-                        sb.AppendLine(session.TunnelsToString());
+                    foreach (Session session in Sessions)
+                        if (session.Status == SessionStatus.CONNECTED && !session.SendCommands)
+                            sb.AppendLine(session.TunnelsToString());
 
-                return sb.Length > 0 ? sb.ToString(0, sb.Length - Environment.NewLine.Length) : "No sessions connected.";
+                    _connectedSessions = sb.Length > 0 ? sb.ToString(0, sb.Length - Environment.NewLine.Length) : "No sessions connected.";
+                }
+
+                return _connectedSessions;
             }
 
-        }
-
-        internal void SaveSessions() {
-            Settings.SetCData("Sessions", JsonConvert.SerializeObject(Sessions, Formatting.Indented));
-            Settings.Save();
         }
 
         private ObservableCollection<Session> _sessions;
@@ -141,6 +177,11 @@ namespace ssh_tunnel_agent {
                 return _sessions;
             }
 
+        }
+
+        internal void SaveSessions() {
+            Settings.SetCData("Sessions", JsonConvert.SerializeObject(Sessions, Formatting.Indented));
+            Settings.Save();
         }
 
 

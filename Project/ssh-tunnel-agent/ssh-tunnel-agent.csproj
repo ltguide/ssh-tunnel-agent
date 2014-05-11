@@ -86,17 +86,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SessionWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Classes\EditableObject.cs" />
+    <Compile Include="Classes\RelayCommandGeneric.cs" />
     <Compile Include="Classes\WinApi.cs" />
-    <Compile Include="Config\ConfigurationTextElement.cs" />
+    <Compile Include="Config\TextConfigurationElement.cs" />
     <Compile Include="Config\SettingsSection.cs" />
     <Compile Include="Data\TunnelType.cs" />
     <Compile Include="Data\Tunnel.cs" />
@@ -117,10 +114,6 @@
     <Compile Include="Tray\Converters\SessionStatusToContextMenuHeaderConverter.cs" />
     <Compile Include="Tray\Converters\SessionStatusToImageSourceConverter.cs" />
     <Compile Include="Data\Session.cs" />
-    <Compile Include="SessionWindow.xaml.cs">
-      <DependentUpon>SessionWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

@@ -33,7 +33,7 @@ namespace ssh_tunnel_agent.Config {
         }
 
         public static void SetCData(string key, string value) {
-            Get<ConfigurationTextElement>(key).Value = value;
+            Get<TextConfigurationElement>(key).Value = value;
         }
 
         public static void Set(string key, object value) {
@@ -41,7 +41,7 @@ namespace ssh_tunnel_agent.Config {
         }
 
         public static string GetCData(string key) {
-            return Get<ConfigurationTextElement>(key).Value;
+            return Get<TextConfigurationElement>(key).Value;
         }
 
         public static T Get<T>(string key) {

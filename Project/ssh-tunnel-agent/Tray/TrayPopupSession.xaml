@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:localTray="clr-namespace:ssh_tunnel_agent.Tray" 
              mc:Ignorable="d" 
-             DataContext="{Binding RelativeSource={RelativeSource Self}}" Loaded="UserControl_Loaded">
+             x:Name="x"
+             Loaded="UserControl_Loaded">
     <UserControl.Resources>
         <Storyboard x:Key="HighlightCloseButton">
             <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"
@@ -51,8 +52,8 @@
                 <DropShadowEffect Opacity="0.8"/>
             </Border.Effect>
             <StackPanel>
-                <TextBlock Text="{Binding PopupTitle}" />
-                <Grid>
+                <TextBlock Text="{Binding ElementName=x,Path=PopupTitle}" />
+                <Grid DataContext="{Binding ElementName=x}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
                         <ColumnDefinition />
@@ -72,8 +73,8 @@
                     <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=Session.Username}" />
                 </Grid>
                 <DockPanel HorizontalAlignment="Right">
-                    <Button Content="OK" Command="{Binding OkCommand}" />
-                    <Button Content="Cancel" Command="{Binding CancelCommand}" />
+                    <Button Content="OK" Command="{Binding SessionOkCommand}" CommandParameter="{Binding ElementName=x,Path=Session}" />
+                    <Button Content="Cancel" Command="{Binding SessionCancelCommand}" />
                 </DockPanel>
             </StackPanel>
         </Border>
@@ -87,6 +88,6 @@
                Opacity="0.4"
                ToolTip="Close Balloon"
                x:Name="imgClose"
-               MouseDown="imgClose_MouseDown" />
+               MouseUp="imgClose_MouseUp"/>
     </Grid>
 </UserControl>
