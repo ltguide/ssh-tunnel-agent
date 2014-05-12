@@ -27,14 +27,14 @@ namespace ssh_tunnel_agent {
 
         private bool _autoStartApplication = Settings.Get<bool>("AutoStartApplication");
         public bool AutoStartApplication {
+            get {
+                return _autoStartApplication;
+            }
             set {
                 _autoStartApplication = value;
                 Settings.Set("AutoStartApplication", value);
                 Settings.Save();
                 NotifyPropertyChanged();
-            }
-            get {
-                return _autoStartApplication;
             }
         }
 
@@ -136,10 +136,6 @@ namespace ssh_tunnel_agent {
 
         private string _connectedSessions;
         public string ConnectedSessions {
-            set {
-                _connectedSessions = value;
-                NotifyPropertyChanged();
-            }
             get {
                 if (_connectedSessions == null) {
                     StringBuilder sb = new StringBuilder();
@@ -153,15 +149,14 @@ namespace ssh_tunnel_agent {
 
                 return _connectedSessions;
             }
-
+            set {
+                _connectedSessions = value;
+                NotifyPropertyChanged();
+            }
         }
 
         private ObservableCollection<Session> _sessions;
         public ObservableCollection<Session> Sessions {
-            set {
-                _sessions = value;
-                NotifyPropertyChanged();
-            }
             get {
                 if (_sessions == null) {
                     string value = Settings.GetCData("Sessions");
@@ -176,7 +171,10 @@ namespace ssh_tunnel_agent {
 
                 return _sessions;
             }
-
+            set {
+                _sessions = value;
+                NotifyPropertyChanged();
+            }
         }
 
         internal void SaveSessions() {

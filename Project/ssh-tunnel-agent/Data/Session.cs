@@ -1,5 +1,4 @@
-﻿
-using ssh_tunnel_agent.Classes;
+﻿using ssh_tunnel_agent.Classes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,15 +7,6 @@ using System.Text;
 namespace ssh_tunnel_agent.Data {
     public class Session : EditableObject<Session> {
         private ViewModel viewModel;
-
-        private string _name;
-        public string Name {
-            get { return _name; }
-            set {
-                _name = value;
-                NotifyPropertyChanged();
-            }
-        }
 
         private SessionStatus _status;
         public SessionStatus Status {
@@ -27,23 +17,56 @@ namespace ssh_tunnel_agent.Data {
             }
         }
 
-        public bool AutoConnect { get; set; }
-        public bool AutoReconnect { get; set; }
-        public bool SendCommands { get; set; }
+        private string _name;
+        public string Name {
+            get { return _name; }
+            set {
+                _name = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         //plink -ssh [options] HOST COMMAND
-        public string Username { get; set; }                // -l username
         public string Host { get; set; }                    // host
         public uint Port { get; set; }                      // -P port
+        public string Username { get; set; }                // -l username
         //public System.Security.SecureString Password { get; set; } // -pw passwd // http://stackoverflow.com/questions/12657792/how-to-securely-save-username-password-local
         public bool Compression { get; set; }               // -C
-        public bool X11Forwarding { get; set; }             // -X -x
+        public bool UsePageant { get; set; }                // -agent -noagent
         public bool AgentForwarding { get; set; }           // -A -a
+        public string PrivateKeyFile { get; set; }          // -i keyfile
+
+        private bool _sendCommands;
+        public bool SendCommands {
+            get { return _sendCommands; }
+            set {
+                _sendCommands = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public bool AutoConnect { get; set; }
+        public bool AutoReconnect { get; set; }
         public bool StartShell { get; set; }                // -N
-        public string PrivateKeyFile { get; set; }              // -i keyfile
-        public bool UsePageant { get; set; }                   // -agent -noagent
-        public string RemoteCommand { get; set; }           // command
-        public string RemoteCommandFile { get; set; }       // -m file
+        public bool X11Forwarding { get; set; }             // -X -x
+
+        private string _remoteCommand;
+        public string RemoteCommand {                       // command
+            get { return _remoteCommand; }
+            set {
+                _remoteCommand = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private string _remoteCommandFile;
+        public string RemoteCommandFile {                   // -m file
+            get { return _remoteCommandFile; }
+            set {
+                _remoteCommandFile = value;
+                NotifyPropertyChanged();
+            }
+        }
         public bool RemoteCommandSubsystem { get; set; }    // -s
 
         private List<Tunnel> _tunnels = new List<Tunnel>();
@@ -58,33 +81,36 @@ namespace ssh_tunnel_agent.Data {
         }
 
         public Session() {
-            Name = String.Empty;
             Status = SessionStatus.DISCONNECTED;
-            AutoConnect = false;
-            AutoReconnect = false;
-            SendCommands = false;
-            Username = String.Empty;
+
+            Name = String.Empty;
             Host = String.Empty;
             Port = 22;
+            Username = String.Empty;
             Compression = true;
-            X11Forwarding = false;
-            AgentForwarding = false;
-            StartShell = false;
-            PrivateKeyFile = String.Empty;
             UsePageant = true;
+            AgentForwarding = false;
+            PrivateKeyFile = String.Empty;
             SendCommands = false;
+
+            AutoConnect = false;
+            AutoReconnect = false;
+            StartShell = false;
+            X11Forwarding = false;
+
             RemoteCommand = String.Empty;
             RemoteCommandFile = String.Empty;
             RemoteCommandSubsystem = false;
 
 
 
-                        Host = "itweb";
+            //Host = "itweb";
             //            Tunnels.Add(new Tunnel() { Type = TunnelType.DYNAMIC, ListenIP = "0.0.0.0", ListenPort = 8080 });
             //            Tunnels.Add(new Tunnel() { Type = TunnelType.LOCAL, ListenIP = "0.0.0.0", ListenPort = 4444, Host = "10.5.205.235", Port = 3389 });
         }
 
         private string getArguments() {
+            string command = String.Empty;
             StringBuilder sb = new StringBuilder("-v -ssh");
 
             if (Username != String.Empty)
@@ -107,7 +133,9 @@ namespace ssh_tunnel_agent.Data {
             sb.Append(UsePageant ? " -agent" : " -noagent");
 
             if (SendCommands) {
-                if (RemoteCommandFile != String.Empty)
+                if (RemoteCommand != String.Empty)
+                    command = RemoteCommand;
+                else if (RemoteCommandFile != String.Empty)
                     sb.AppendFormat(" -m {0}", RemoteCommandFile);
 
                 if (RemoteCommandSubsystem)
@@ -115,12 +143,12 @@ namespace ssh_tunnel_agent.Data {
             }
             else
                 foreach (Tunnel tunnel in Tunnels)
-                    sb.Append(tunnel.ToString(" -{0} {1}:{2}", ":{0}:{1}"));
+                    sb.Append(tunnel.ToString(" -{0} {1}:{2}", ":{3}:{4}"));
 
             sb.AppendFormat(" {0}", Host);
 
-            if (SendCommands && RemoteCommand != String.Empty)
-                sb.AppendFormat(" {0}", RemoteCommand);
+            if (command != String.Empty)
+                sb.AppendFormat(" {0}", command);
 
             return sb.ToString();
         }
@@ -150,7 +178,7 @@ namespace ssh_tunnel_agent.Data {
         internal string TunnelsToString() {
             StringBuilder sb = new StringBuilder(Name);
             foreach (Tunnel tunnel in Tunnels)
-                sb.Append(tunnel.ToString("\n{0} {1}:{2}", " > {0}:{1}"));
+                sb.Append(tunnel.ToString("\n{0} {1}:{2}", " > {3}:{4}"));
 
             return sb.ToString();
         }

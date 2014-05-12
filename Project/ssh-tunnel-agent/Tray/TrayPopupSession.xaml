@@ -3,91 +3,243 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:localTray="clr-namespace:ssh_tunnel_agent.Tray" 
              mc:Ignorable="d" 
-             x:Name="MyControl"
-             Loaded="UserControl_Loaded">
-    <UserControl.Resources>
-        <Storyboard x:Key="HighlightCloseButton">
-            <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"
-                                           Storyboard.TargetName="imgClose"
-                                           Storyboard.TargetProperty="(UIElement.Opacity)">
-                <SplineDoubleKeyFrame KeyTime="00:00:00"
-                                      Value="0.4" />
-                <SplineDoubleKeyFrame KeyTime="00:00:00.3000000"
-                                      Value="1" />
-            </DoubleAnimationUsingKeyFrames>
-        </Storyboard>
-        <Storyboard x:Key="FadeCloseButton">
-            <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"
-                                           Storyboard.TargetName="imgClose"
-                                           Storyboard.TargetProperty="(UIElement.Opacity)">
-                <SplineDoubleKeyFrame KeyTime="00:00:00"
-                                      Value="1" />
-                <SplineDoubleKeyFrame KeyTime="00:00:00.3000000"
-                                      Value="0.4" />
-            </DoubleAnimationUsingKeyFrames>
-        </Storyboard>
-    </UserControl.Resources>
-    <UserControl.Triggers>
-        <EventTrigger RoutedEvent="Mouse.MouseEnter"
-                      SourceName="imgClose">
-            <BeginStoryboard Storyboard="{StaticResource HighlightCloseButton}"
-                             x:Name="HighlightCloseButton_BeginStoryboard" />
-        </EventTrigger>
-        <EventTrigger RoutedEvent="Mouse.MouseLeave"
-                      SourceName="imgClose">
-            <BeginStoryboard Storyboard="{StaticResource FadeCloseButton}"
-                             x:Name="FadeCloseButton_BeginStoryboard" />
-        </EventTrigger>
-    </UserControl.Triggers>
-    <Grid>
-        <Border
+             x:Name="UserControl" 
+             Loaded="UserControl_Loaded" MinWidth="400">
+    <Border
             Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" 
             BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" 
             CornerRadius="3" 
             BorderThickness="1"
             Padding="7">
-            <Border.Effect>
-                <DropShadowEffect Opacity="0.8"/>
-            </Border.Effect>
-            <StackPanel>
-                <TextBlock Text="{Binding ElementName=MyControl,Path=PopupTitle}" />
-                <Grid DataContext="{Binding ElementName=MyControl}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    <Label Grid.Row="0" Content="Name" />
-                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=Session.Name}" />
+        <Border.Effect>
+            <DropShadowEffect Opacity="0.8"/>
+        </Border.Effect>
+        <StackPanel DataContext="{Binding ElementName=UserControl}">
+            <TextBlock FontWeight="Bold" Foreground="{DynamicResource {x:Static SystemColors.MenuTextBrushKey}}" Text="{Binding PopupTitle}" />
+            <Line Stroke="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" Stretch="Fill" X2="1" Margin="0,1,0,3" />
 
-                    <Label Grid.Row="1" Content="Host" />
-                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=Session.Host}" />
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
 
-                    <Label Grid.Row="2" Content="Username" />
-                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=Session.Username}" />
-                </Grid>
-                <DockPanel HorizontalAlignment="Right">
-                    <Button Content="OK" Command="{Binding SessionOkCommand}" CommandParameter="{Binding ElementName=MyControl,Path=Session}" />
-                    <Button Content="Cancel" Command="{Binding SessionCancelCommand}" />
-                </DockPanel>
-            </StackPanel>
-        </Border>
-        <Image HorizontalAlignment="Right"
-               Margin="0,10,10,0"
-               VerticalAlignment="Top"
-               Width="16"
-               Height="16"
-               Source="/Assets/Close.png"
-               Stretch="Fill"
-               Opacity="0.4"
-               ToolTip="Close Balloon"
-               x:Name="imgClose"
-               MouseUp="imgClose_MouseUp"/>
-    </Grid>
+                <StackPanel Grid.Row="0">
+                    <Label Content="Session Name" />
+                    <TextBox Text="{Binding Path=Session.Name}" Width="200" HorizontalAlignment="Left" />
+                </StackPanel>
+
+                <GroupBox Grid.Row="1" Header="Server" Margin="0,7,0,0">
+                    <Grid Margin="4">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition  />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Row="0" Grid.Column="0">
+                            <Label Content="Host Name (or IP Address)" />
+                            <TextBox Text="{Binding Path=Session.Host}" Width="250" HorizontalAlignment="Left" />
+                        </StackPanel>
+                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="10,0,0,0">
+                            <Label Content="Port" />
+                            <TextBox Text="{Binding Path=Session.Port}" Width="40" HorizontalAlignment="Left" />
+                        </StackPanel>
+
+                        <CheckBox Grid.Row="1" Grid.ColumnSpan="2" Content="Enable Compression"  IsChecked="{Binding Path=Session.Compression}" Margin="0,7,0,0" />
+
+                        <StackPanel Grid.Row="2" Grid.ColumnSpan="2">
+                            <Label Content="Automatically send Username" />
+                            <TextBox Text="{Binding Path=Session.Username}" Width="150" HorizontalAlignment="Left" />
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Grid.Row="2" Header="Public Key Auth" Margin="0,7,0,0">
+                    <Grid Margin="4">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0">
+                            <CheckBox Content="Attempt authentication using Pageant" IsChecked="{Binding Path=Session.UsePageant}" />
+                            <CheckBox Content="Allow agent forwarding" IsChecked="{Binding Path=Session.AgentForwarding}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1">
+                            <Label Content="Private Key File" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding Path=Session.PrivateKeyFile}" VerticalAlignment="Center"  />
+                                <Button Grid.Column="1" Content="Browse" Margin="4,0" />
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Grid.Row="3" Header="Session" Margin="0,7,0,0">
+                    <GroupBox.Style>
+                        <Style TargetType="GroupBox">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=Session.SendCommands}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </GroupBox.Style>
+                    <StackPanel Margin="4">
+                        <CheckBox Content="Automatically connect on start" IsChecked="{Binding Path=Session.AutoConnect}" />
+                        <CheckBox Content="Automatically reconnect on failure" IsChecked="{Binding Path=Session.AutoReconnect}" />
+                        <CheckBox Content="Start a shell" IsChecked="{Binding Path=Session.StartShell}" />
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Grid.Row="4" Header="Forwarding" Margin="0,7,0,0">
+                    <GroupBox.Style>
+                        <Style TargetType="GroupBox">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=Session.SendCommands}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </GroupBox.Style>
+                    <StackPanel Margin="4">
+                        <CheckBox Content="Enable X11 Forwarding" IsChecked="{Binding Path=Session.X11Forwarding}" VerticalAlignment="Top" />
+                        <TextBlock Text="Tunnels" Margin="0,7,0,0" />
+                        <ListBox>
+                            <!--ItemsSource="{Binding Path=Session.Tunnels}"-->
+                            <ListBoxItem Content="x" />
+                            <ListBoxItem Content="y" />
+                        </ListBox>
+                        <Button Content="Remove" HorizontalAlignment="Right" Margin="4,6,4,4" />
+
+                        <Line Stroke="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Stretch="Fill" X2="1" Margin="0,2,0,3" />
+
+                        <GroupBox Header="Type" Margin="0,7,0,0" HorizontalAlignment="Left">
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton GroupName="xxx" Content="Local" />
+                            <RadioButton GroupName="xxx" Content="Remote" Margin="20,0" />
+                            <RadioButton GroupName="xxx" Content="Dynamic" />
+                        </StackPanel>
+                        </GroupBox>
+                        
+                        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                            <GroupBox Header="Source" HorizontalAlignment="Left">
+                                <Grid Margin="4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Row="0" Grid.Column="0">
+                                        <Label Content="IP Address" />
+                                        <TextBox Text="{Binding Path=Tunnel.SourceIP}" Width="100" HorizontalAlignment="Left" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="0" Grid.Column="1" Margin="10,0,0,0">
+                                        <Label Content="Port" />
+                                        <TextBox Text="{Binding Path=Tunnel.SourcePort}" Width="40" HorizontalAlignment="Left" />
+                                    </StackPanel>
+                                </Grid>
+                            </GroupBox>
+
+                            <GroupBox Header="Destination" HorizontalAlignment="Left" Margin="7,0,0,0">
+                                <!-- hide if Type is DYNAMIC -->
+                                <Grid Margin="4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Row="0" Grid.Column="0">
+                                        <Label Content="Host or IP address" />
+                                        <TextBox Text="{Binding Path=Tunnel.Host}" Width="100" HorizontalAlignment="Left" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="0" Grid.Column="1" Margin="10,0,0,0">
+                                        <Label Content="Port" />
+                                        <TextBox Text="{Binding Path=Tunnel.Port}" Width="40" HorizontalAlignment="Left" />
+                                    </StackPanel>
+                                </Grid>
+                            </GroupBox>
+                        </StackPanel>
+
+                        <DockPanel Margin="0,4,0,-4" HorizontalAlignment="Right">
+                            <Button Content="Add" HorizontalAlignment="Left" />
+                            <Button Content="Clear" HorizontalAlignment="Left" />
+                        </DockPanel>
+
+                    </StackPanel>
+                </GroupBox>
+
+                <ToggleButton Grid.Row="5" Content="Send Data instead of opening Tunnel" Margin="0,7,0,0" IsChecked="{Binding Path=Session.SendCommands}" HorizontalAlignment="Left" />
+
+                <GroupBox Grid.Row="6" Margin="0,7,0,0" Header="Send commands to server">
+                    <GroupBox.Style>
+                        <Style TargetType="GroupBox">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=Session.SendCommands}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </GroupBox.Style>
+                    <StackPanel Margin="4">
+                        <StackPanel>
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="IsEnabled" Value="False" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=Session.RemoteCommandFile}" Value="">
+                                            <Setter Property="IsEnabled" Value="True" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <Label Content="Remote Command" />
+                            <TextBox Text="{Binding Path=Session.RemoteCommand}" />
+                        </StackPanel>
+
+                        <StackPanel>
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="IsEnabled" Value="False" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=Session.RemoteCommand}" Value="">
+                                            <Setter Property="IsEnabled" Value="True" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <Label Content="Remote Command File" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding Path=Session.RemoteCommandFile}" VerticalAlignment="Center"  />
+                                <Button Grid.Column="1" Content="Browse" Margin="4,0" HorizontalAlignment="Right" />
+                            </Grid>
+                        </StackPanel>
+
+                        <CheckBox Content="Remote Command is SSH Subsystem" IsChecked="{Binding Path=Session.RemoteCommandSubsystem}" Margin="0,4,0,0" />
+                    </StackPanel>
+                </GroupBox>
+            </Grid>
+            <Line Stroke="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" Stretch="Fill" X2="1" Margin="0,4,0,3" />
+            <DockPanel HorizontalAlignment="Right">
+                <Button Content="Ok" Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}, Path=DataContext.SessionOkCommand}" CommandParameter="{Binding Path=Session}" />
+                <Button Content="Cancel" Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}, Path=DataContext.SessionCancelCommand}" />
+            </DockPanel>
+        </StackPanel>
+    </Border>
 </UserControl>

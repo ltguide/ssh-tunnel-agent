@@ -98,7 +98,7 @@
     <Compile Include="Data\TunnelType.cs" />
     <Compile Include="Data\Tunnel.cs" />
     <Compile Include="Data\SessionStatus.cs" />
-    <Compile Include="Classes\NotifyPropertyChanged.cs" />
+    <Compile Include="Classes\NotifyPropertyChangedBase.cs" />
     <Compile Include="Classes\RelayCommand.cs" />
     <Compile Include="Tray\TrayPopupSession.xaml.cs">
       <DependentUpon>TrayPopupSession.xaml</DependentUpon>
