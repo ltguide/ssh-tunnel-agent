@@ -105,8 +105,10 @@ namespace ssh_tunnel_agent.Data {
 
 
             //Host = "itweb";
-            //            Tunnels.Add(new Tunnel() { Type = TunnelType.DYNAMIC, ListenIP = "0.0.0.0", ListenPort = 8080 });
-            //            Tunnels.Add(new Tunnel() { Type = TunnelType.LOCAL, ListenIP = "0.0.0.0", ListenPort = 4444, Host = "10.5.205.235", Port = 3389 });
+            Tunnels.Add(new Tunnel() { Type = TunnelType.DYNAMIC, ListenIP = "0.0.0.0", ListenPort = 8080 });
+            Tunnels.Add(new Tunnel() { Type = TunnelType.LOCAL, ListenIP = "0.0.0.0", ListenPort = 4444, Host = "10.5.205.235", Port = 3389 });
+            Tunnels.Add(new Tunnel() { Type = TunnelType.DYNAMIC, ListenIP = "0.0.0.0", ListenPort = 8081 });
+            Tunnels.Add(new Tunnel() { Type = TunnelType.DYNAMIC, ListenIP = "0.0.0.0", ListenPort = 8082 });
         }
 
         private string getArguments() {
@@ -175,10 +177,12 @@ namespace ssh_tunnel_agent.Data {
             viewModel.ConnectedSessions = null;
         }
 
-        internal string TunnelsToString() {
-            StringBuilder sb = new StringBuilder(Name);
+        public override string ToString() {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine(Name);
+
             foreach (Tunnel tunnel in Tunnels)
-                sb.Append(tunnel.ToString("\n{0} {1}:{2}", " > {3}:{4}"));
+                sb.AppendLine(tunnel.ToString());
 
             return sb.ToString();
         }

@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:localTray="clr-namespace:ssh_tunnel_agent.Tray" 
              mc:Ignorable="d" 
-             IsVisibleChanged="UserControl_IsVisibleChanged" MinWidth="250">
+             IsVisibleChanged="UserControl_IsVisibleChanged"
+             MinWidth="250">
     <Border
             Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" 
             BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" 

@@ -4,12 +4,11 @@ using ssh_tunnel_agent.Classes;
 using ssh_tunnel_agent.Config;
 using ssh_tunnel_agent.Data;
 using ssh_tunnel_agent.Tray;
-using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace ssh_tunnel_agent {
@@ -134,25 +133,22 @@ namespace ssh_tunnel_agent {
             }
         }
 
-        private string _connectedSessions;
-        public string ConnectedSessions {
+        private CollectionViewSource _connectedSessions;
+        public CollectionView ConnectedSessions {
             get {
                 if (_connectedSessions == null) {
-                    StringBuilder sb = new StringBuilder();
+                    _connectedSessions = new CollectionViewSource();
 
-                    foreach (Session session in Sessions)
-                        if (session.Status == SessionStatus.CONNECTED && !session.SendCommands)
-                            sb.AppendLine(session.TunnelsToString());
-
-                    _connectedSessions = sb.Length > 0 ? sb.ToString(0, sb.Length - Environment.NewLine.Length) : "No sessions connected.";
+                    _connectedSessions.Source = Sessions;
+                    _connectedSessions.Filter += (sender, e) => {
+                        Session session = e.Item as Session;
+                        e.Accepted = session.Status == SessionStatus.CONNECTED && !session.SendCommands;
+                    };
                 }
 
-                return _connectedSessions;
+                return _connectedSessions.View as CollectionView;
             }
-            set {
-                _connectedSessions = value;
-                NotifyPropertyChanged();
-            }
+            set { _connectedSessions.View.Refresh(); }
         }
 
         private ObservableCollection<Session> _sessions;

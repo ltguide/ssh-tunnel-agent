@@ -15,6 +15,10 @@ namespace ssh_tunnel_agent.Data {
             Type = TunnelType.LOCAL;
         }
 
+        public override string ToString() {
+            return ToString("{0} {1}:{2}", " > {3}:{4}");
+        }
+
         public string ToString(string basic, string extended) {
             StringBuilder sb = new StringBuilder(basic);
             if (Type != TunnelType.DYNAMIC)

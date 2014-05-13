@@ -119,23 +119,20 @@
                     <StackPanel Margin="4">
                         <CheckBox Content="Enable X11 Forwarding" IsChecked="{Binding Path=Session.X11Forwarding}" VerticalAlignment="Top" />
                         <TextBlock Text="Tunnels" Margin="0,7,0,0" />
-                        <ListBox>
-                            <!--ItemsSource="{Binding Path=Session.Tunnels}"-->
-                            <ListBoxItem Content="x" />
-                            <ListBoxItem Content="y" />
-                        </ListBox>
-                        <Button Content="Remove" HorizontalAlignment="Right" Margin="4,6,4,4" />
+                        <ListBox Name="listTunnels" ItemsSource="{Binding Path=Session.Tunnels}" Height="64" />
+
+                        <Button Content="Remove" Command="{Binding RemoveTunnelCommand}" CommandParameter="{Binding ElementName=listTunnels,Path=SelectedItem}" HorizontalAlignment="Right" Margin="4,6,4,4" />
 
                         <Line Stroke="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" Stretch="Fill" X2="1" Margin="0,2,0,3" />
 
                         <GroupBox Header="Type" Margin="0,7,0,0" HorizontalAlignment="Left">
-                        <StackPanel Orientation="Horizontal">
-                            <RadioButton GroupName="xxx" Content="Local" />
-                            <RadioButton GroupName="xxx" Content="Remote" Margin="20,0" />
-                            <RadioButton GroupName="xxx" Content="Dynamic" />
-                        </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton GroupName="xxx" Content="Local" />
+                                <RadioButton GroupName="xxx" Content="Remote" Margin="20,0" />
+                                <RadioButton GroupName="xxx" Content="Dynamic" />
+                            </StackPanel>
                         </GroupBox>
-                        
+
                         <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
                             <GroupBox Header="Source" HorizontalAlignment="Left">
                                 <Grid Margin="4">
@@ -174,8 +171,8 @@
                         </StackPanel>
 
                         <DockPanel Margin="0,4,0,-4" HorizontalAlignment="Right">
-                            <Button Content="Add" HorizontalAlignment="Left" />
-                            <Button Content="Clear" HorizontalAlignment="Left" />
+                            <Button Content="Add" Command="{Binding AddTunnelCommand}" HorizontalAlignment="Left" />
+                            <Button Content="Clear" Command="{Binding ClearTunnelCommand}" HorizontalAlignment="Left" />
                         </DockPanel>
 
                     </StackPanel>
