@@ -23,7 +23,7 @@
                 Right/Double-click Session to control
             </TextBlock>
             <Line Stroke="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" Stretch="Fill" X2="1" Margin="0,3,0,1" />
-            <ListView Name="listSessions" ItemsSource="{Binding Path=Sessions}" TargetUpdated="listSessions_TargetUpdated" BorderThickness="1" MouseDoubleClick="listSessions_MouseDoubleClick" Margin="0,3">
+            <ListView Name="listSessions" ItemsSource="{Binding Sessions}" TargetUpdated="listSessions_TargetUpdated" BorderThickness="1" MouseDoubleClick="listSessions_MouseDoubleClick" Margin="0,3">
                 <ListView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="{Binding PlacementTarget.SelectedItem.Status, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Converter={localTray:SessionStatusToContextMenuHeaderConverter}}" Command="{Binding TriggerSessionCommand}" CommandParameter="{Binding Path=PlacementTarget.SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}" />
@@ -34,7 +34,7 @@
                 <ListView.Style>
                     <Style TargetType="ListView">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Path=Sessions.Count}" Value="0">
+                            <DataTrigger Binding="{Binding Sessions.Count}" Value="0">
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
                         </Style.Triggers>

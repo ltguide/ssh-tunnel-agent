@@ -36,7 +36,6 @@
   <ItemGroup>
     <Reference Include="Hardcodet.Wpf.TaskbarNotification">
       <HintPath>..\packages\Hardcodet.NotifyIcon.Wpf.1.0.5\lib\net45\Hardcodet.Wpf.TaskbarNotification.dll</HintPath>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
       <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -100,9 +99,11 @@
     <Compile Include="Data\SessionStatus.cs" />
     <Compile Include="Classes\NotifyPropertyChangedBase.cs" />
     <Compile Include="Classes\RelayCommand.cs" />
+    <Compile Include="Tray\Converters\EnumComparisonToBoolConverter.cs" />
     <Compile Include="Tray\TrayPopupSession.xaml.cs">
       <DependentUpon>TrayPopupSession.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SessionViewModel.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="Config\Settings.cs" />
     <Compile Include="Tray\TrayPopup.xaml.cs">

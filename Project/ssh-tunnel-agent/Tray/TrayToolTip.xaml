@@ -23,16 +23,47 @@
                 Right-click to Configure or Exit
             </TextBlock>
             <Line Stroke="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" Stretch="Fill" X2="1" Margin="0,3,0,1" />
-            <ItemsControl  ItemsSource="{Binding ConnectedSessions}" BorderThickness="0">
+            <ItemsControl ItemsSource="{Binding ConnectedSessions}" BorderThickness="0">
+                <ItemsControl.Style>
+                    <Style TargetType="ItemsControl">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ConnectedSessions.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ItemsControl.Style>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Margin="0,1,0,2" >
-                            <TextBlock Text="{Binding Path=Name}" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" FontWeight="Bold" />
-                            <ListBox ItemsSource="{Binding Path=Tunnels}" />
+                            <TextBlock Text="{Binding Name}" Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" FontWeight="Bold" />
+                            <ListBox ItemsSource="{Binding Tunnels}">
+                                <ListBox.Style>
+                                    <Style TargetType="ListBox">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Tunnels.Count}" Value="0">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ListBox.Style>
+                            </ListBox>
                         </StackPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+            <TextBlock Text="No connected sessions." Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ConnectedSessions.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
         </StackPanel>
     </Border>
 </UserControl>

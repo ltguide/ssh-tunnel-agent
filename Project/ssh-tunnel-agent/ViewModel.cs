@@ -1,11 +1,12 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 using ssh_tunnel_agent.Classes;
 using ssh_tunnel_agent.Config;
 using ssh_tunnel_agent.Data;
 using ssh_tunnel_agent.Tray;
+using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
@@ -13,7 +14,6 @@ using System.Windows.Input;
 
 namespace ssh_tunnel_agent {
     public class ViewModel : NotifyPropertyChangedBase {
-
         private TaskbarIcon _trayIcon;
         public TaskbarIcon TrayIcon {
             get {
@@ -24,15 +24,29 @@ namespace ssh_tunnel_agent {
             }
         }
 
-        private bool _autoStartApplication = Settings.Get<bool>("AutoStartApplication");
+        private bool? _autoStartApplication;
         public bool AutoStartApplication {
             get {
-                return _autoStartApplication;
+                if (_autoStartApplication == null) {
+                    _autoStartApplication = false;
+
+                    try {
+                        RegistryKey run = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
+                        object value = run.GetValue("ssh-tunnel-agent");
+                        if (value != null) {
+                            if (value.ToString() == '"' + Environment.GetCommandLineArgs()[0] + '"')
+                                _autoStartApplication = true;
+                            else
+                                run.DeleteValue("ssh-tunnel-agent");
+                        }
+                    }
+                    catch (Exception) { }
+                }
+
+                return (bool)_autoStartApplication;
             }
             set {
                 _autoStartApplication = value;
-                Settings.Set("AutoStartApplication", value);
-                Settings.Save();
                 NotifyPropertyChanged();
             }
         }
@@ -53,14 +67,17 @@ namespace ssh_tunnel_agent {
                 return _autoStartApplicationCommand ?? (
                     _autoStartApplicationCommand = new RelayCommand(
                         () => {
-                            AutoStartApplication = !AutoStartApplication;
+                            try {
+                                RegistryKey run = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
+                                if (AutoStartApplication == false) {
+                                    run.SetValue("ssh-tunnel-agent", '"' + Environment.GetCommandLineArgs()[0] + '"', RegistryValueKind.String);
+                                }
+                                else
+                                    run.DeleteValue("ssh-tunnel-agent");
 
-                            if (AutoStartApplication) {
-                                Debug.WriteLine("add to HKCU Run");
+                                AutoStartApplication = !AutoStartApplication;
                             }
-                            else {
-                                Debug.WriteLine("remove from HKCU Run");
-                            }
+                            catch (Exception) { }
                         }
                     ));
             }
@@ -103,6 +120,24 @@ namespace ssh_tunnel_agent {
             }
         }
 
+        private RelayCommand<Session> _sessionRemoveCommand;
+        public RelayCommand<Session> SessionRemoveCommand {
+            get {
+                return _sessionRemoveCommand ?? (
+                    _sessionRemoveCommand = new RelayCommand<Session>(
+                        (session) => {
+                            if (session.isEditing)
+                                Sessions.Remove(session);
+
+                            SaveSessions();
+
+                            TrayIcon.CloseBalloon();
+                        },
+                        (session) => session != null && session.isEditing
+                    ));
+            }
+        }
+
         private RelayCommand<Session> _sessionOkCommand;
         public RelayCommand<Session> SessionOkCommand {
             get {
@@ -118,7 +153,7 @@ namespace ssh_tunnel_agent {
 
                             TrayIcon.CloseBalloon();
                         },
-                        (session) => session != null && session.Name != "" && session.Host != ""
+                        (session) => session != null && session.Name != "" && session.Host != "" && ((session.Tunnels.Count > 0 && !session.SendCommands) || ((session.RemoteCommand != String.Empty || session.RemoteCommandFile != String.Empty) && session.SendCommands))
                     ));
             }
         }
@@ -155,7 +190,7 @@ namespace ssh_tunnel_agent {
         public ObservableCollection<Session> Sessions {
             get {
                 if (_sessions == null) {
-                    string value = Settings.GetCData("Sessions");
+                    string value = new Settings().GetCData("Sessions");
                     if (value == "")
                         _sessions = new ObservableCollection<Session>();
                     else {
@@ -174,23 +209,9 @@ namespace ssh_tunnel_agent {
         }
 
         internal void SaveSessions() {
-            Settings.SetCData("Sessions", JsonConvert.SerializeObject(Sessions, Formatting.Indented));
-            Settings.Save();
+            Settings settings = new Settings();
+            settings.SetCData("Sessions", JsonConvert.SerializeObject(Sessions, Formatting.Indented));
+            settings.Save();
         }
-
-
-
-
-
-        /*private RelayCommand _testCommand;
-        public ICommand TestCommand {
-            get {
-                if (_testCommand == null) _testCommand = new RelayCommand((param) => {
-                   
-                });
-
-                return _testCommand;
-            }
-        }*/
     }
 }

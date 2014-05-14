@@ -1,6 +1,6 @@
 ﻿using ssh_tunnel_agent.Classes;
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text;
 
@@ -26,7 +26,6 @@ namespace ssh_tunnel_agent.Data {
             }
         }
 
-        //plink -ssh [options] HOST COMMAND
         public string Host { get; set; }                    // host
         public uint Port { get; set; }                      // -P port
         public string Username { get; set; }                // -l username
@@ -69,8 +68,8 @@ namespace ssh_tunnel_agent.Data {
         }
         public bool RemoteCommandSubsystem { get; set; }    // -s
 
-        private List<Tunnel> _tunnels = new List<Tunnel>();
-        public List<Tunnel> Tunnels {
+        private ObservableCollection<Tunnel> _tunnels = new ObservableCollection<Tunnel>();
+        public ObservableCollection<Tunnel> Tunnels {
             set { _tunnels = value; }
             get { return _tunnels; }
         }
@@ -102,13 +101,9 @@ namespace ssh_tunnel_agent.Data {
             RemoteCommandFile = String.Empty;
             RemoteCommandSubsystem = false;
 
-
-
             //Host = "itweb";
-            Tunnels.Add(new Tunnel() { Type = TunnelType.DYNAMIC, ListenIP = "0.0.0.0", ListenPort = 8080 });
-            Tunnels.Add(new Tunnel() { Type = TunnelType.LOCAL, ListenIP = "0.0.0.0", ListenPort = 4444, Host = "10.5.205.235", Port = 3389 });
-            Tunnels.Add(new Tunnel() { Type = TunnelType.DYNAMIC, ListenIP = "0.0.0.0", ListenPort = 8081 });
-            Tunnels.Add(new Tunnel() { Type = TunnelType.DYNAMIC, ListenIP = "0.0.0.0", ListenPort = 8082 });
+            //Tunnels.Add(new Tunnel() { Type = TunnelType.LOCAL, ListenIP = "0.0.0.0", ListenPort = 5001, Host = "10.5.205.235", Port = 3389 });
+            //Tunnels.Add(new Tunnel() { Type = TunnelType.DYNAMIC, ListenIP = "0.0.0.0", ListenPort = 8080 });
         }
 
         private string getArguments() {
@@ -164,8 +159,7 @@ namespace ssh_tunnel_agent.Data {
 
         public void Connect() {
             Status = SessionStatus.CONNECTED;
-            Debug.WriteLine("connect: " + Name);
-            Debug.WriteLine(getArguments());
+            Debug.WriteLine("connect: " + Name + " > " + getArguments());
 
             viewModel.ConnectedSessions = null;
         }

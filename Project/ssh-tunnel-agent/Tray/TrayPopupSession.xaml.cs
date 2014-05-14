@@ -1,7 +1,6 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
 using ssh_tunnel_agent.Classes;
 using ssh_tunnel_agent.Data;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -11,18 +10,10 @@ namespace ssh_tunnel_agent.Tray {
     /// Interaction logic for TrayPopupSession.xaml
     /// </summary>
     public partial class TrayPopupSession : UserControl {
-        public Session Session { get; private set; }
-        public Tunnel Tunnel { get; private set; }
-        public string PopupTitle { get; private set; }
-
         public TrayPopupSession(Session session) {
-            Session = session;
-            if (Session.isEditing)
-                PopupTitle = "Edit Session: " + Session.Name;
-            else
-                PopupTitle = "New Session";
-
             InitializeComponent();
+
+            border.DataContext = new SessionViewModel(session);
             TaskbarIcon.AddBalloonClosingHandler(this, OnBalloonClosing);
         }
 
@@ -33,7 +24,7 @@ namespace ssh_tunnel_agent.Tray {
         }
 
         private void OnBalloonClosing(object sender, RoutedEventArgs e) {
-            Session.CancelEdit();
+            ((SessionViewModel)border.DataContext).Session.CancelEdit();
 
             // send focus back to TrayPopup and allow it to close
             Popup TrayPopupResolved = TaskbarIcon.GetParentTaskbarIcon(this).TrayPopupResolved;
@@ -41,39 +32,12 @@ namespace ssh_tunnel_agent.Tray {
             WinApi.ActivatePopup(TrayPopupResolved);
         }
 
+        private void UserControl_GotFocus(object sender, RoutedEventArgs e) {
+            TextBox textBox = e.OriginalSource as TextBox;
+            if (textBox == null)
+                return;
 
-        // MOVE THESE TO OWN VIEW MODEL
-        // ADD REMOVE SESSION BUTTON YOU IDIOT
-
-        private RelayCommand _addTunnelCommand;
-        public RelayCommand AddTunnelCommand {
-            get {
-                return _addTunnelCommand ?? (
-                    _addTunnelCommand = new RelayCommand(
-                        () => Debug.WriteLine("AddTunnelCommand")
-                    ));
-            }
-        }
-
-        private RelayCommand<Tunnel> _removeTunnelCommand;
-        public RelayCommand<Tunnel> RemoveTunnelCommand {
-            get {
-                return _removeTunnelCommand ?? (
-                    _removeTunnelCommand = new RelayCommand<Tunnel>(
-                        (tunnel) => Debug.WriteLine("RemoveTunnelCommand " + tunnel.ToString("\n{0} {1}:{2}", " > {3}:{4}")),
-                        (tunnel) => tunnel != null
-                    ));
-            }
-        }
-
-        private RelayCommand _clearTunnelCommand;
-        public RelayCommand ClearTunnelCommand {
-            get {
-                return _clearTunnelCommand ?? (
-                    _clearTunnelCommand = new RelayCommand(
-                        () => Debug.WriteLine("ClearTunnelCommand")
-                    ));
-            }
+            if (textBox.Text.Length > 0 && textBox.SelectionStart == 0) textBox.SelectAll();
         }
     }
 }
