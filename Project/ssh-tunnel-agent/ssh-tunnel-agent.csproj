@@ -65,6 +65,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Windows\SessionConfigure.xaml.cs">
+      <DependentUpon>SessionConfigure.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\SessionConsole.xaml.cs">
+      <DependentUpon>SessionConsole.xaml</DependentUpon>
+    </Compile>
     <Page Include="DefaultStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -94,6 +100,7 @@
     <Compile Include="Classes\WinApi.cs" />
     <Compile Include="Config\TextConfigurationElement.cs" />
     <Compile Include="Config\SettingsSection.cs" />
+    <Compile Include="Classes\StandardDataReceivedEventArgs.cs" />
     <Compile Include="Data\TunnelType.cs" />
     <Compile Include="Data\Tunnel.cs" />
     <Compile Include="Data\SessionStatus.cs" />
@@ -115,6 +122,14 @@
     <Compile Include="Tray\Converters\SessionStatusToContextMenuHeaderConverter.cs" />
     <Compile Include="Tray\Converters\SessionStatusToImageSourceConverter.cs" />
     <Compile Include="Data\Session.cs" />
+    <Page Include="Windows\SessionConfigure.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\SessionConsole.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

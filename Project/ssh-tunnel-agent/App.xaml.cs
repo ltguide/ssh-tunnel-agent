@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hardcodet.Wpf.TaskbarNotification;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -9,37 +10,88 @@ namespace ssh_tunnel_agent {
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application {
-        private void onStartup(object sender, StartupEventArgs e) {
-            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
+        public static string Plink { get; set; }
 
+        private void Application_Exit(object sender, ExitEventArgs e) {
             try {
-                //check for plink.exe at right version, delete ours
-                //else
-                //upgradeFile("ssh-tunnel-agent-plink.exe", "Release 0.63");
+                closeViewModel();
             }
-            catch (Exception ex) {
-                MessageBox.Show("Failed to write ssh-tunnel-agent-plink.exe: " + ex.Message, "SSH Tunnel Agent", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-            }
+            catch (Exception) { }
+        }
+
+        private void closeViewModel() {
+            TaskbarIcon trayIcon = FindResource("TrayIcon") as TaskbarIcon;
+            if (trayIcon == null)
+                return;
+
+            ViewModel viewModel = trayIcon.DataContext as ViewModel;
+            if (viewModel == null)
+                return;
+
+            viewModel.DisconnectSessions();
+        }
+
+        private void Application_Startup(object sender, StartupEventArgs e) {
+            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
 
             try {
                 FindResource("TrayIcon");
             }
             catch (Exception) {
-                MessageBox.Show("Unable to load Hardcodet.Wpf.TaskbarNotification.dll", "SSH Tunnel Agent", MessageBoxButton.OK, MessageBoxImage.Error);
-                Application.Current.Shutdown();
+                shutdown("Unable to load required embedded extensions.");
+                return;
+            }
+
+            string myPlink = "ssh-tunnel-agent-plink.exe";
+            if (matchFileVersion("plink.exe", new Version(0, 63))) {
+                Plink = "plink.exe";
+                try { File.Delete(myPlink); }
+                catch (Exception) { }
+            }
+            else if (upgradeFile(myPlink, new Version(0, 63)))
+                Plink = myPlink;
+            else {
+                shutdown("Failed to find up to date plink.exe or create " + myPlink);
+                return;
             }
         }
 
-        private void upgradeFile(string name, string version) {
-            if (File.Exists(name) && FileVersionInfo.GetVersionInfo(name).FileVersion == version)
-                return;
+        private bool upgradeFile(string name, Version version) {
+            if (matchFileVersion(name, version))
+                return true;
 
             using (Stream resource = getEmbedded(name)) {
                 if (resource != null)
                     using (FileStream file = new FileStream(name, FileMode.Create, FileAccess.Write)) {
-                        resource.CopyTo(file);
+                        try {
+                            resource.CopyTo(file);
+                            return true;
+                        }
+                        catch (IOException) { }
                     }
             }
+
+            return false;
+        }
+
+        private bool matchFileVersion(string name, Version version) {
+            if (File.Exists(name))
+                try {
+                    return new Version(new string(
+                            Array.FindAll<char>(
+                                FileVersionInfo.GetVersionInfo(name).FileVersion.ToCharArray(),
+                                c => char.IsDigit(c) || c == '.'
+                            )
+                        )) >= version;
+                }
+                catch (FormatException) { }
+
+            return false;
+        }
+
+        private void shutdown(string message) {
+            MessageBox.Show(message, "SSH Tunnel Agent", MessageBoxButton.OK, MessageBoxImage.Error);
+            Application.Current.Shutdown();
         }
 
         public Assembly CurrentDomain_AssemblyResolve(Object sender, ResolveEventArgs args) {

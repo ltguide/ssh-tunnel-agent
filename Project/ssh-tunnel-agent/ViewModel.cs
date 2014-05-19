@@ -4,11 +4,10 @@ using Newtonsoft.Json;
 using ssh_tunnel_agent.Classes;
 using ssh_tunnel_agent.Config;
 using ssh_tunnel_agent.Data;
-using ssh_tunnel_agent.Tray;
+using ssh_tunnel_agent.Windows;
 using System;
 using System.Collections.ObjectModel;
 using System.Windows;
-using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 
@@ -89,7 +88,7 @@ namespace ssh_tunnel_agent {
                 return _triggerSessionCommand ?? (
                     _triggerSessionCommand = new RelayCommand<Session>(
                         (session) => session.ToggleConnection(),
-                        (session) => TrayIcon.CustomBalloon == null
+                        (session) => session != null && App.Current.MainWindow == null //TrayIcon.CustomBalloon == null
                     ));
             }
         }
@@ -105,10 +104,13 @@ namespace ssh_tunnel_agent {
                             else
                                 session.BeginEdit();
 
-                            TrayIcon.ShowCustomBalloon(new TrayPopupSession(session), PopupAnimation.Slide, null);
+                            App.Current.MainWindow = new SessionConfigure(session);
+                            App.Current.MainWindow.Show();
+                            //TrayIcon.ShowCustomBalloon(new TrayPopupSession(session), PopupAnimation.Slide, null);
                         },
                         (session) => {
-                            if (TrayIcon.CustomBalloon != null)
+                            if (App.Current.MainWindow != null)
+                                //if (TrayIcon.CustomBalloon != null)
                                 return false;
 
                             if (session != null && session.Status == SessionStatus.CONNECTED)
@@ -131,7 +133,8 @@ namespace ssh_tunnel_agent {
 
                             SaveSessions();
 
-                            TrayIcon.CloseBalloon();
+                            App.Current.MainWindow.Close();
+                            //TrayIcon.CloseBalloon();
                         },
                         (session) => session != null && session.isEditing
                     ));
@@ -151,7 +154,8 @@ namespace ssh_tunnel_agent {
 
                             SaveSessions();
 
-                            TrayIcon.CloseBalloon();
+                            App.Current.MainWindow.Close();
+                            //TrayIcon.CloseBalloon();
                         },
                         (session) => session != null && session.Name != "" && session.Host != "" && ((session.Tunnels.Count > 0 && !session.SendCommands) || ((session.RemoteCommand != String.Empty || session.RemoteCommandFile != String.Empty) && session.SendCommands))
                     ));
@@ -163,7 +167,7 @@ namespace ssh_tunnel_agent {
             get {
                 return _sessionCancelCommand ?? (
                     _sessionCancelCommand = new RelayCommand(
-                        () => TrayIcon.CloseBalloon()
+                        () => App.Current.MainWindow.Close() //TrayIcon.CloseBalloon()
                     ));
             }
         }
@@ -195,8 +199,13 @@ namespace ssh_tunnel_agent {
                         _sessions = new ObservableCollection<Session>();
                     else {
                         _sessions = JsonConvert.DeserializeObject<ObservableCollection<Session>>(value);
-                        foreach (Session session in _sessions)
+                        foreach (Session session in _sessions) {
+                            session.SetViewModel(this);
                             session.Status = SessionStatus.DISCONNECTED;
+
+                            if (session.AutoConnect)
+                                session.Connect();
+                        }
                     }
                 }
 
@@ -212,6 +221,11 @@ namespace ssh_tunnel_agent {
             Settings settings = new Settings();
             settings.SetCData("Sessions", JsonConvert.SerializeObject(Sessions, Formatting.Indented));
             settings.Save();
+        }
+
+        internal void DisconnectSessions() {
+            foreach (Session session in Sessions)
+                session.Disconnect();
         }
     }
 }

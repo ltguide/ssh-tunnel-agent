@@ -18,11 +18,15 @@
         </Border.Effect>
         <StackPanel>
             <TextBlock FontWeight="Bold" Foreground="{DynamicResource {x:Static SystemColors.MenuTextBrushKey}}">SSH Tunnel Agent</TextBlock>
-            <Line Stroke="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" Stretch="Fill" X2="1" Margin="0,1,0,3" />
+
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="0,1,0,3" />
+            
             <TextBlock Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}">
                 Right/Double-click Session to control
             </TextBlock>
-            <Line Stroke="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" Stretch="Fill" X2="1" Margin="0,3,0,1" />
+
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="0,3,0,1" />
+            
             <ListView Name="listSessions" ItemsSource="{Binding Sessions}" TargetUpdated="listSessions_TargetUpdated" BorderThickness="1" MouseDoubleClick="listSessions_MouseDoubleClick" Margin="0,3">
                 <ListView.ContextMenu>
                     <ContextMenu>
