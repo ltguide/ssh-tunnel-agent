@@ -14,12 +14,6 @@ namespace ssh_tunnel_agent.Windows {
             dockCommands.DataContext = session.GetViewModel();
         }
 
-        //private void UserControl_Loaded(object sender, RoutedEventArgs e) {
-        // make TrayPopup stay open and focus on THIS
-        //TaskbarIcon.GetParentTaskbarIcon(this).TrayPopupResolved.StaysOpen = true;
-        //WinApi.ActivatePopup(Parent);
-        //}
-
         private void Window_GotFocus(object sender, RoutedEventArgs e) {
             TextBox textBox = e.OriginalSource as TextBox;
             if (textBox == null)
@@ -30,11 +24,6 @@ namespace ssh_tunnel_agent.Windows {
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
             ((SessionViewModel)border.DataContext).Session.CancelEdit();
-
-            // send focus back to TrayPopup and allow it to close
-            //Popup TrayPopupResolved = TaskbarIcon.GetParentTaskbarIcon(this).TrayPopupResolved;
-            //TrayPopupResolved.StaysOpen = false;
-            //WinApi.ActivatePopup(TrayPopupResolved);
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Markup;
 
-namespace ssh_tunnel_agent.Tray {
+namespace ssh_tunnel_agent.Classes {
     [ValueConversion(typeof(Enum), typeof(bool))]
     public class EnumComparisonToBoolConverter : MarkupExtension, IValueConverter {
         public EnumComparisonToBoolConverter() { }

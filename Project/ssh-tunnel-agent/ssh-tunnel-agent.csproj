@@ -79,10 +79,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Tray\TrayPopupSession.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Tray\TrayPopup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -97,7 +93,6 @@
     </Compile>
     <Compile Include="Classes\EditableObject.cs" />
     <Compile Include="Classes\RelayCommandGeneric.cs" />
-    <Compile Include="Classes\WinApi.cs" />
     <Compile Include="Config\TextConfigurationElement.cs" />
     <Compile Include="Config\SettingsSection.cs" />
     <Compile Include="Classes\StandardDataReceivedEventArgs.cs" />
@@ -106,10 +101,7 @@
     <Compile Include="Data\SessionStatus.cs" />
     <Compile Include="Classes\NotifyPropertyChangedBase.cs" />
     <Compile Include="Classes\RelayCommand.cs" />
-    <Compile Include="Tray\Converters\EnumComparisonToBoolConverter.cs" />
-    <Compile Include="Tray\TrayPopupSession.xaml.cs">
-      <DependentUpon>TrayPopupSession.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="Classes\EnumComparisonToBoolConverter.cs" />
     <Compile Include="SessionViewModel.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="Config\Settings.cs" />

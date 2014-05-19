@@ -1,5 +1,4 @@
-﻿using Hardcodet.Wpf.TaskbarNotification;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using Newtonsoft.Json;
 using ssh_tunnel_agent.Classes;
 using ssh_tunnel_agent.Config;
@@ -13,16 +12,6 @@ using System.Windows.Input;
 
 namespace ssh_tunnel_agent {
     public class ViewModel : NotifyPropertyChangedBase {
-        private TaskbarIcon _trayIcon;
-        public TaskbarIcon TrayIcon {
-            get {
-                if (_trayIcon == null)
-                    _trayIcon = (TaskbarIcon)Application.Current.FindResource("TrayIcon");
-
-                return _trayIcon;
-            }
-        }
-
         private bool? _autoStartApplication;
         public bool AutoStartApplication {
             get {
@@ -88,7 +77,7 @@ namespace ssh_tunnel_agent {
                 return _triggerSessionCommand ?? (
                     _triggerSessionCommand = new RelayCommand<Session>(
                         (session) => session.ToggleConnection(),
-                        (session) => session != null && App.Current.MainWindow == null //TrayIcon.CustomBalloon == null
+                        (session) => session != null && App.Current.MainWindow == null
                     ));
             }
         }
@@ -106,11 +95,9 @@ namespace ssh_tunnel_agent {
 
                             App.Current.MainWindow = new SessionConfigure(session);
                             App.Current.MainWindow.Show();
-                            //TrayIcon.ShowCustomBalloon(new TrayPopupSession(session), PopupAnimation.Slide, null);
                         },
                         (session) => {
                             if (App.Current.MainWindow != null)
-                                //if (TrayIcon.CustomBalloon != null)
                                 return false;
 
                             if (session != null && session.Status == SessionStatus.CONNECTED)
@@ -134,7 +121,6 @@ namespace ssh_tunnel_agent {
                             SaveSessions();
 
                             App.Current.MainWindow.Close();
-                            //TrayIcon.CloseBalloon();
                         },
                         (session) => session != null && session.isEditing
                     ));
@@ -155,7 +141,6 @@ namespace ssh_tunnel_agent {
                             SaveSessions();
 
                             App.Current.MainWindow.Close();
-                            //TrayIcon.CloseBalloon();
                         },
                         (session) => session != null && session.Name != "" && session.Host != "" && ((session.Tunnels.Count > 0 && !session.SendCommands) || ((session.RemoteCommand != String.Empty || session.RemoteCommandFile != String.Empty) && session.SendCommands))
                     ));
@@ -167,7 +152,7 @@ namespace ssh_tunnel_agent {
             get {
                 return _sessionCancelCommand ?? (
                     _sessionCancelCommand = new RelayCommand(
-                        () => App.Current.MainWindow.Close() //TrayIcon.CloseBalloon()
+                        () => App.Current.MainWindow.Close()
                     ));
             }
         }

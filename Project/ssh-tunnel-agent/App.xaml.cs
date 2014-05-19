@@ -12,6 +12,16 @@ namespace ssh_tunnel_agent {
     public partial class App : Application {
         public static string Plink { get; set; }
 
+        private static TaskbarIcon _trayIcon;
+        public static TaskbarIcon TrayIcon {
+            get {
+                if (_trayIcon == null)
+                    _trayIcon = (TaskbarIcon)Application.Current.FindResource("TrayIcon");
+
+                return _trayIcon;
+            }
+        }
+
         private void Application_Exit(object sender, ExitEventArgs e) {
             try {
                 closeViewModel();
@@ -20,11 +30,10 @@ namespace ssh_tunnel_agent {
         }
 
         private void closeViewModel() {
-            TaskbarIcon trayIcon = FindResource("TrayIcon") as TaskbarIcon;
-            if (trayIcon == null)
+            if (TrayIcon == null)
                 return;
 
-            ViewModel viewModel = trayIcon.DataContext as ViewModel;
+            ViewModel viewModel = TrayIcon.DataContext as ViewModel;
             if (viewModel == null)
                 return;
 

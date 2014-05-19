@@ -3,14 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:localTray="clr-namespace:ssh_tunnel_agent.Tray"
         xmlns:localData="clr-namespace:ssh_tunnel_agent.Data"
+        xmlns:localClasses="clr-namespace:ssh_tunnel_agent.Classes"
         Title="Configure Session"
         Name="windowConfigure"
         GotFocus="Window_GotFocus"
         Closing="Window_Closing"
         ResizeMode="NoResize"
         SizeToContent="WidthAndHeight"
-        WindowStartupLocation="CenterScreen"
-        WindowStyle="None">
+        WindowStartupLocation="CenterScreen">
     <Border
             Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" 
             BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" 
@@ -124,9 +124,9 @@
 
                             <GroupBox Header="Type" Margin="0,7,0,0" HorizontalAlignment="Left">
                                 <StackPanel Orientation="Horizontal">
-                                    <RadioButton Content="Local" IsChecked="{Binding Tunnel.Type, Converter={localTray:EnumComparisonToBoolConverter}, ConverterParameter={x:Static localData:TunnelType.LOCAL}}" />
-                                    <RadioButton Content="Remote" Margin="20,0" IsChecked="{Binding Tunnel.Type, Converter={localTray:EnumComparisonToBoolConverter}, ConverterParameter={x:Static localData:TunnelType.REMOTE}}" />
-                                    <RadioButton Content="Dynamic" IsChecked="{Binding Tunnel.Type, Converter={localTray:EnumComparisonToBoolConverter}, ConverterParameter={x:Static localData:TunnelType.DYNAMIC}}" />
+                                    <RadioButton Content="Local" IsChecked="{Binding Tunnel.Type, Converter={localClasses:EnumComparisonToBoolConverter}, ConverterParameter={x:Static localData:TunnelType.LOCAL}}" />
+                                    <RadioButton Content="Remote" Margin="20,0" IsChecked="{Binding Tunnel.Type, Converter={localClasses:EnumComparisonToBoolConverter}, ConverterParameter={x:Static localData:TunnelType.REMOTE}}" />
+                                    <RadioButton Content="Dynamic" IsChecked="{Binding Tunnel.Type, Converter={localClasses:EnumComparisonToBoolConverter}, ConverterParameter={x:Static localData:TunnelType.DYNAMIC}}" />
                                 </StackPanel>
                             </GroupBox>
 
