@@ -1,4 +1,5 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
+using ssh_tunnel_agent.Tray;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -33,7 +34,7 @@ namespace ssh_tunnel_agent {
             if (TrayIcon == null)
                 return;
 
-            ViewModel viewModel = TrayIcon.DataContext as ViewModel;
+            TrayViewModel viewModel = TrayIcon.DataContext as TrayViewModel;
             if (viewModel == null)
                 return;
 

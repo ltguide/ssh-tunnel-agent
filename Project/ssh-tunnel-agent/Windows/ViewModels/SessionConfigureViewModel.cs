@@ -5,12 +5,10 @@ using System;
 using System.IO;
 using System.Windows.Controls;
 
-namespace ssh_tunnel_agent {
-    public class SessionViewModel : NotifyPropertyChangedBase {
+namespace ssh_tunnel_agent.Windows {
+    public class SessionConfigureViewModel : NotifyPropertyChangedBase {
         public Session Session { get; private set; }
-
-
-        public string PopupTitle { get; private set; }
+        public string Title { get; private set; }
 
         private Tunnel _tunnel;
         public Tunnel Tunnel {
@@ -21,12 +19,12 @@ namespace ssh_tunnel_agent {
             }
         }
 
-        public SessionViewModel(Session session) {
+        public SessionConfigureViewModel(Session session) {
             Session = session;
             if (Session.isEditing)
-                PopupTitle = "Edit Session: " + Session.Name;
+                Title = "Edit Session: " + Session.Name;
             else
-                PopupTitle = "New Session";
+                Title = "New Session";
 
             Tunnel = new Tunnel();
             //Tunnel = new Tunnel() { Type = TunnelType.REMOTE, ListenIP = "192.168.1.105", ListenPort = 4444, Host = "10.5.205.235", Port = 3389 };

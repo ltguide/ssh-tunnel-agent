@@ -10,7 +10,7 @@ namespace ssh_tunnel_agent.Windows {
         public SessionConfigure(Session session) {
             InitializeComponent();
 
-            DataContext = new SessionViewModel(session);
+            DataContext = new SessionConfigureViewModel(session);
             dockCommands.DataContext = session.GetViewModel();
         }
 
@@ -23,7 +23,11 @@ namespace ssh_tunnel_agent.Windows {
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-            ((SessionViewModel)border.DataContext).Session.CancelEdit();
+            ((SessionConfigureViewModel)frame.DataContext).Session.CancelEdit();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e) {
+            txtSessionName.Focus();
         }
     }
 }

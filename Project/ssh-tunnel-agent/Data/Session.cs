@@ -1,20 +1,19 @@
 ﻿using ssh_tunnel_agent.Classes;
+using ssh_tunnel_agent.Tray;
+using ssh_tunnel_agent.Windows;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace ssh_tunnel_agent.Data {
     public class Session : EditableObject<Session> {
-        private ViewModel viewModel;
-        private Process process;
-        private bool processExit;
-        private Timer reconnectTimer;
-        private event EventHandler<StandardDataReceivedEventArgs> StandardDataReceived;
-        private CancellationTokenSource tokenSource;
+        private TrayViewModel _viewModel;
+        private Process _process;
+        private bool _processExit;
+        private Timer _reconnectTimer;
+        private SessionConsole _sessionConsole;
 
         private SessionStatus _status;
         public SessionStatus Status {
@@ -82,14 +81,12 @@ namespace ssh_tunnel_agent.Data {
             get { return _tunnels; }
         }
 
-        public Session(ViewModel viewModel)
+        public Session(TrayViewModel viewModel)
             : this() {
             SetViewModel(viewModel);
         }
 
         public Session() {
-            StandardDataReceived += session_StandardDataReceived;
-
             Status = SessionStatus.DISCONNECTED;
 
             Name = String.Empty;
@@ -110,10 +107,6 @@ namespace ssh_tunnel_agent.Data {
             RemoteCommand = String.Empty;
             RemoteCommandFile = String.Empty;
             RemoteCommandSubsystem = false;
-
-            //Host = "itweb";
-            //Tunnels.Add(new Tunnel() { Type = TunnelType.LOCAL, ListenIP = "0.0.0.0", ListenPort = 5001, Host = "10.5.205.235", Port = 3389 });
-            //Tunnels.Add(new Tunnel() { Type = TunnelType.DYNAMIC, ListenIP = "0.0.0.0", ListenPort = 8080 });
         }
 
         private string getArguments() {
@@ -160,13 +153,13 @@ namespace ssh_tunnel_agent.Data {
             return sb.ToString();
         }
 
-        public void SetViewModel(ViewModel viewModel) {
-            this.viewModel = viewModel;
+        public void SetViewModel(TrayViewModel viewModel) {
+            this._viewModel = viewModel;
         }
 
 
-        public ViewModel GetViewModel() {
-            return viewModel;
+        public TrayViewModel GetViewModel() {
+            return _viewModel;
         }
 
         public void ToggleConnection() {
@@ -182,29 +175,30 @@ namespace ssh_tunnel_agent.Data {
 
             Debug.WriteLine("connect: \"" + Name + "\"; " + App.Plink + " " + getArguments());
 
-            processExit = false;
+            _processExit = false;
 
             ProcessStartInfo startInfo = new ProcessStartInfo {
                 FileName = App.Plink,
                 Arguments = getArguments(),
                 UseShellExecute = false,
-                //CreateNoWindow = true,
+                CreateNoWindow = true,
                 RedirectStandardError = true,
-                //RedirectStandardInput = true,
+                RedirectStandardInput = true,
                 RedirectStandardOutput = true,
             };
 
-            process = Process.Start(startInfo);
-            if (process == null)
+            _process = Process.Start(startInfo);
+            if (_process == null)
                 return;
 
-            process.EnableRaisingEvents = true;
-            process.Exited += process_Exited;
+            _process.EnableRaisingEvents = true;
+            _process.Exited += process_Exited;
 
-            tokenSource = new CancellationTokenSource();
+            if (_sessionConsole != null)
+                _sessionConsole.Close();
 
-            Task.Factory.StartNew(() => monitorStream(process.StandardError, StandardStreamType.ERROR, tokenSource.Token), tokenSource.Token);
-            Task.Factory.StartNew(() => monitorStream(process.StandardOutput, StandardStreamType.OUTPUT, tokenSource.Token), tokenSource.Token);
+            _sessionConsole = new SessionConsole(_process, this);
+            _sessionConsole.Show();
 
             Status = SessionStatus.CONNECTED;
         }
@@ -215,60 +209,35 @@ namespace ssh_tunnel_agent.Data {
 
             Debug.WriteLine("disconnect: \"" + Name + "\"");
 
-            processExit = true;
-            process.Kill();
-            process.WaitForExit();
-            process.Close();
+            _processExit = true;
+            _process.Kill();
+            _process.WaitForExit();
+            _process.Close();
+
+            if (_sessionConsole != null)
+                _sessionConsole.Close();
 
             Status = SessionStatus.DISCONNECTED;
         }
 
         private void process_Exited(object sender, EventArgs e) {
-            if (!processExit) {
-                Debug.WriteLine("exit: \"" + Name + "\"; " + process.ExitCode);
+            // todo test commands ExitCode to preserve Console
+            if (!_processExit) {
+                Debug.WriteLine("exit: \"" + Name + "\"; " + _process.ExitCode);
 
-                if (process.ExitCode == 0)
+                if (_process.ExitCode == 0)
                     Status = SessionStatus.DISCONNECTED;
                 else {
                     Status = SessionStatus.ERROR;
 
                     if (AutoReconnect)
-                        (reconnectTimer ?? (
-                                reconnectTimer = new Timer(state => Connect())
+                        (_reconnectTimer ?? (
+                                _reconnectTimer = new Timer(state => Connect())
                             )).Change(new Random().Next(500, 5000), Timeout.Infinite);
                 }
 
-                process.Close();
+                _process.Close();
             }
-        }
-
-        private async void monitorStream(StreamReader streamReader, StandardStreamType type, CancellationToken ct) {
-            char[] buffer = new char[1024];
-
-            while (!streamReader.EndOfStream) {
-                if (ct.IsCancellationRequested)
-                    return;
-
-                int read = await streamReader.ReadAsync(buffer, 0, 1024);
-                if (read > 0)
-                    if (StandardDataReceived != null) {
-                        if (type == StandardStreamType.ERROR)
-                            Debug.Write("");
-                        StandardDataReceived(streamReader, new StandardDataReceivedEventArgs(type, new string(buffer, 0, read)));
-                    }
-            }
-
-            streamReader.Close();
-        }
-
-        private void session_StandardDataReceived(object sender, StandardDataReceivedEventArgs e) {
-            Debug.Write(e.Type + "---" + e.Data);
-            /*if (e.Type == StandardStreamType.ERROR) {
-                if (e.Data.StartsWith("*************")) tokenSource.Cancel();
-            }*/
-
-            // todo split console functionality off into own class
-
         }
 
         public override string ToString() {

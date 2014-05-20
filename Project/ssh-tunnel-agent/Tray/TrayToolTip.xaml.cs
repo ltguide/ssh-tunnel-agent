@@ -12,7 +12,7 @@ namespace ssh_tunnel_agent.Tray {
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e) {
-            ViewModel viewModel = TaskbarIcon.GetParentTaskbarIcon(this).DataContext as ViewModel;
+            TrayViewModel viewModel = TaskbarIcon.GetParentTaskbarIcon(this).DataContext as TrayViewModel;
             if (viewModel != null)
                 viewModel.ConnectedSessions = null;
         }

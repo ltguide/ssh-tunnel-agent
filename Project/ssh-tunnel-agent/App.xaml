@@ -7,8 +7,8 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Tray/TrayIcon.xaml" />
-                <ResourceDictionary Source="/DefaultStyle.xaml" />
+                <ResourceDictionary Source="/Resources/DefaultStyle.xaml" />
+                <ResourceDictionary Source="/Resources/TrayIcon.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

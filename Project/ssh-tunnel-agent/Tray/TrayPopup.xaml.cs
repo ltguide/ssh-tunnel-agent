@@ -33,7 +33,7 @@ namespace ssh_tunnel_agent.Tray {
             if (item == null)
                 return;
 
-            ViewModel vm = DataContext as ViewModel;
+            TrayViewModel vm = DataContext as TrayViewModel;
             vm.TriggerSessionCommand.Execute(item);
         }
 

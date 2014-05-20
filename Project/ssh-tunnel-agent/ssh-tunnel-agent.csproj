@@ -65,17 +65,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Windows\Classes\ConsoleStatus.cs" />
+    <Compile Include="Windows\Classes\StandardStreamType.cs" />
     <Compile Include="Windows\SessionConfigure.xaml.cs">
       <DependentUpon>SessionConfigure.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\SessionConsole.xaml.cs">
       <DependentUpon>SessionConsole.xaml</DependentUpon>
     </Compile>
-    <Page Include="DefaultStyle.xaml">
+    <Page Include="Resources\DefaultStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Tray\TrayIcon.xaml">
+    <Page Include="Resources\TrayIcon.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -95,15 +97,16 @@
     <Compile Include="Classes\RelayCommandGeneric.cs" />
     <Compile Include="Config\TextConfigurationElement.cs" />
     <Compile Include="Config\SettingsSection.cs" />
-    <Compile Include="Classes\StandardDataReceivedEventArgs.cs" />
+    <Compile Include="Windows\Classes\StandardDataReceivedEventArgs.cs" />
     <Compile Include="Data\TunnelType.cs" />
     <Compile Include="Data\Tunnel.cs" />
     <Compile Include="Data\SessionStatus.cs" />
     <Compile Include="Classes\NotifyPropertyChangedBase.cs" />
     <Compile Include="Classes\RelayCommand.cs" />
-    <Compile Include="Classes\EnumComparisonToBoolConverter.cs" />
-    <Compile Include="SessionViewModel.cs" />
-    <Compile Include="ViewModel.cs" />
+    <Compile Include="Windows\Converters\EnumComparisonToBoolConverter.cs" />
+    <Compile Include="Windows\ViewModels\SessionConsoleViewModel.cs" />
+    <Compile Include="Windows\ViewModels\SessionConfigureViewModel.cs" />
+    <Compile Include="Tray\ViewModels\TrayViewModel.cs" />
     <Compile Include="Config\Settings.cs" />
     <Compile Include="Tray\TrayPopup.xaml.cs">
       <DependentUpon>TrayPopup.xaml</DependentUpon>
@@ -172,9 +175,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Embedded\Newtonsoft.Json.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Assets\Close.png" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>powershell -Command "&amp; {&amp;'$(DevEnvDir)..\..\..\Git\bin\git.exe' --git-dir=\"$(SolutionDir)..\.git\" rev-parse --short HEAD | tee-object -variable rev; Get-Content \"$(ProjectDir)Properties\PREAssemblyInfo.cs\" | ForEach-Object { $_ -replace \"GIT_SHORTHASH\", \"$rev\" } | Set-Content \"$(ProjectDir)Properties\AssemblyInfo.cs\" }"</PreBuildEvent>

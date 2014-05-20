@@ -10,8 +10,8 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 
-namespace ssh_tunnel_agent {
-    public class ViewModel : NotifyPropertyChangedBase {
+namespace ssh_tunnel_agent.Tray {
+    public class TrayViewModel : NotifyPropertyChangedBase {
         private bool? _autoStartApplication;
         public bool AutoStartApplication {
             get {
