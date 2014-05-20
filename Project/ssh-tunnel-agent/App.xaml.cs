@@ -22,7 +22,7 @@ namespace ssh_tunnel_agent {
                 return _trayIcon;
             }
         }
-
+        // todo program icons
         private void Application_Exit(object sender, ExitEventArgs e) {
             try {
                 closeViewModel();

@@ -40,7 +40,7 @@ namespace ssh_tunnel_agent.Windows {
         }
 
         private void txtStandardInput_KeyUp(object sender, KeyEventArgs e) {
-            if (e.Key != Key.Enter || txtStandardInput.Text.Length == 0)
+            if (e.Key != Key.Enter)
                 return;
 
             txtStandardInput.GetBindingExpression(TextBox.TextProperty).UpdateSource();
