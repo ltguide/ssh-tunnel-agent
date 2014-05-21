@@ -11,7 +11,8 @@
         ResizeMode="NoResize"
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterScreen"
-        Validation.Error="Window_ValidationError">
+        Validation.Error="Window_ValidationError"
+        Icon="/ssh-tunnel-agent;component/Assets/network_receive.ico">
     <StackPanel Name="frame">
         <TextBlock FontWeight="Bold" Foreground="{DynamicResource {x:Static SystemColors.MenuTextBrushKey}}" Margin="4" Text="{Binding Title}" />
         <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="0,1,0,3" />

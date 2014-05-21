@@ -41,7 +41,7 @@ namespace ssh_tunnel_agent.Windows {
                 if (Status == ConsoleStatus.STOREHOST || Status == ConsoleStatus.UPDATEHOST)
                     StandardError += value + Environment.NewLine;
                 else {
-                    if (Status == ConsoleStatus.PASSWORD)
+                    if (Status == ConsoleStatus.PASSWORD || Status == ConsoleStatus.PRIVATEKEY)
                         StandardOutput += "***";
                     else if (Status != ConsoleStatus.ACCESSGRANTED)
                         StandardOutput += value;
@@ -114,6 +114,8 @@ namespace ssh_tunnel_agent.Windows {
                     Status = ConsoleStatus.LOGINAS;
                 else if (e.Data.EndsWith("'s password: "))
                     Status = ConsoleStatus.PASSWORD;
+                else if (e.Data.StartsWith("Passphrase for key "))
+                    Status = ConsoleStatus.PRIVATEKEY;
 
                 if (Status != ConsoleStatus.ACCESSGRANTED)
                     StandardOutput += e.Data;
