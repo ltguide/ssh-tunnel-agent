@@ -185,7 +185,6 @@ namespace ssh_tunnel_agent.Tray {
                         _sessions = JsonConvert.DeserializeObject<ObservableCollection<Session>>(value);
                         foreach (Session session in _sessions) {
                             session.SetViewModel(this);
-                            session.Status = SessionStatus.DISCONNECTED;
 
                             if (session.AutoConnect)
                                 session.Connect();
