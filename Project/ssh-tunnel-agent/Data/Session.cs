@@ -203,7 +203,10 @@ namespace ssh_tunnel_agent.Data {
                 _sessionConsole.Close();
 
             _sessionConsole = new SessionConsole(_process, this);
+
+#if DEBUG
             _sessionConsole.Show();
+#endif
 
             Status = SessionStatus.CONNECTED;
         }
