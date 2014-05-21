@@ -6,7 +6,7 @@ namespace ssh_tunnel_agent.Classes {
     // based on http://indepthdev.azurewebsites.net/?p=73
     public abstract class EditableObject<T> : NotifyPropertyChangedBase, IEditableObject {
         private T Cache { get; set; }
-        internal bool isEditing;
+        public bool isEditing { get; set; }
 
         public void BeginEdit() {
             if (isEditing)

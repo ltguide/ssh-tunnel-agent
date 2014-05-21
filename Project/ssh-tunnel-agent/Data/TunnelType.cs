@@ -5,7 +5,10 @@ namespace ssh_tunnel_agent.Data {
         LOCAL,
         REMOTE
     }
+
     public static partial class Extensions {
-        public static string getCode(this TunnelType type) { return type.ToString().Substring(0, 1); }
+        public static string getCode(this TunnelType type) {
+            return type.ToString().Substring(0, 1);
+        }
     }
 }

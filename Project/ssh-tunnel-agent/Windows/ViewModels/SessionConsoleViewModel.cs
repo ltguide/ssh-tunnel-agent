@@ -9,9 +9,10 @@ using System.Threading.Tasks;
 namespace ssh_tunnel_agent.Windows {
     public class SessionConsoleViewModel : NotifyPropertyChangedBase {
         private event EventHandler<StandardDataReceivedEventArgs> StandardDataReceived;
-        public event EventHandler<ConsoleStatus> ConsoleStatusUpdated;
-        private CancellationTokenSource tokenSource;
+        private CancellationTokenSource _tokenSource;
         private string[] _splitby = new string[] { "\r\n" };
+
+        public event EventHandler<ConsoleStatus> ConsoleStatusUpdated;
 
         public Process Process { get; private set; }
         public string Title { get; private set; }
@@ -86,10 +87,10 @@ namespace ssh_tunnel_agent.Windows {
 
             StandardDataReceived += session_StandardDataReceived;
 
-            tokenSource = new CancellationTokenSource();
+            _tokenSource = new CancellationTokenSource();
 
-            Task.Factory.StartNew(() => monitorStream(Process.StandardError, StandardStreamType.ERROR, tokenSource.Token), tokenSource.Token);
-            Task.Factory.StartNew(() => monitorStream(Process.StandardOutput, StandardStreamType.OUTPUT, tokenSource.Token), tokenSource.Token);
+            Task.Factory.StartNew(() => monitorStream(Process.StandardError, StandardStreamType.ERROR, _tokenSource.Token), _tokenSource.Token);
+            Task.Factory.StartNew(() => monitorStream(Process.StandardOutput, StandardStreamType.OUTPUT, _tokenSource.Token), _tokenSource.Token);
         }
 
         private async void monitorStream(StreamReader streamReader, StandardStreamType type, CancellationToken ct) {

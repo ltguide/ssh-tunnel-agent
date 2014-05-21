@@ -3,7 +3,6 @@ using System.Xml;
 
 namespace ssh_tunnel_agent.Config {
     public class TextConfigurationElement : ConfigurationElement {
-
         [ConfigurationProperty("Value", IsRequired = true, IsKey = true)]
         public string Value {
             get { return (string)this["Value"]; }

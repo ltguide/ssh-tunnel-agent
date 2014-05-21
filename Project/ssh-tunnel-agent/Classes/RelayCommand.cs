@@ -4,8 +4,8 @@ using System.Windows.Input;
 namespace ssh_tunnel_agent.Classes {
     // based on http://mvvmlight.codeplex.com/
     public class RelayCommand : ICommand {
-        readonly Action _execute;
-        readonly Func<bool> _canExecute;
+        private readonly Action _execute;
+        private readonly Func<bool> _canExecute;
 
         public RelayCommand(Action execute) : this(execute, null) { }
         public RelayCommand(Action execute, Func<bool> canExecute) {

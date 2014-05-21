@@ -3,25 +3,25 @@ using System.Windows;
 
 namespace ssh_tunnel_agent.Config {
     public class Settings {
-        private Configuration config;
-        private SettingsSection settings;
+        private Configuration _config;
+        private SettingsSection _settings;
 
         public Settings() {
-            config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            _config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
             bool addSettings = true;
             try {
-                if (config.Sections["Settings"] != null)
+                if (_config.Sections["Settings"] != null)
                     addSettings = false;
             }
             catch (ConfigurationErrorsException) {
-                config.Sections.Remove("Settings");
+                _config.Sections.Remove("Settings");
             }
 
             if (addSettings)
-                config.Sections.Add("Settings", new SettingsSection());
+                _config.Sections.Add("Settings", new SettingsSection());
 
-            settings = (SettingsSection)config.Sections["Settings"];
+            _settings = (SettingsSection)_config.Sections["Settings"];
         }
 
         public void SetCData(string key, string value) {
@@ -29,7 +29,7 @@ namespace ssh_tunnel_agent.Config {
         }
 
         public void Set(string key, object value) {
-            typeof(SettingsSection).GetProperty(key).SetValue(settings, value);
+            typeof(SettingsSection).GetProperty(key).SetValue(_settings, value);
         }
 
         public string GetCData(string key) {
@@ -37,12 +37,12 @@ namespace ssh_tunnel_agent.Config {
         }
 
         public T Get<T>(string key) {
-            return (T)typeof(SettingsSection).GetProperty(key).GetValue(settings);
+            return (T)typeof(SettingsSection).GetProperty(key).GetValue(_settings);
         }
 
         public void Save() {
             try {
-                config.Save(ConfigurationSaveMode.Modified);
+                _config.Save(ConfigurationSaveMode.Modified);
             }
             catch (ConfigurationErrorsException ex) {
                 MessageBox.Show(ex.Message, "Error Saving", MessageBoxButton.OK, MessageBoxImage.Error);

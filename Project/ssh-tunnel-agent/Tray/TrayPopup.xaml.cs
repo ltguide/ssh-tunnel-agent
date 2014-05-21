@@ -14,6 +14,7 @@ namespace ssh_tunnel_agent.Tray {
         private void listSessions_TargetUpdated(object sender, System.Windows.Data.DataTransferEventArgs e) {
             resizeLastColumn(sender as ListView);
         }
+
         private void resizeLastColumn(ListView listView) {
             if (listView == null)
                 return;

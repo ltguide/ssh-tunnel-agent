@@ -10,6 +10,9 @@ namespace ssh_tunnel_agent {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
+    // app icon comes from https://www.iconfinder.com/icons/15459/network_receive_icon
+    // Public Domain by Various - http://tango.freedesktop.org/The_People
+
     public partial class App : Application {
         public static string Plink { get; set; }
 
@@ -22,7 +25,7 @@ namespace ssh_tunnel_agent {
                 return _trayIcon;
             }
         }
-        // todo program icons
+
         private void Application_Exit(object sender, ExitEventArgs e) {
             try {
                 closeViewModel();

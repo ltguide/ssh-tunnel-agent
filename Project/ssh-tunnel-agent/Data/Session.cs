@@ -108,10 +108,7 @@ namespace ssh_tunnel_agent.Data {
             RemoteCommandFile = String.Empty;
             RemoteCommandSubsystem = false;
         }
-        private string escapeArg(string arg) {
-            arg = arg.Trim();
-            return String.Format("{1}{0}{1}", arg.Replace("\"", "\\\""), arg.Contains(" ") ? "\"" : String.Empty);
-        }
+
         private string getArguments() {
             string command = String.Empty;
             StringBuilder sb = new StringBuilder("-v -ssh");
@@ -154,6 +151,11 @@ namespace ssh_tunnel_agent.Data {
                 sb.AppendFormat(" {0}", escapeArg(command));
 
             return sb.ToString();
+        }
+
+        private string escapeArg(string arg) {
+            arg = arg.Trim();
+            return String.Format("{1}{0}{1}", arg.Replace("\"", "\\\""), arg.Contains(" ") ? "\"" : String.Empty);
         }
 
         public void SetViewModel(TrayViewModel viewModel) {
