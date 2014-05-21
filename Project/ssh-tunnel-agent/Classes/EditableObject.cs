@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.ComponentModel;
 using System.Reflection;
 
@@ -6,6 +7,8 @@ namespace ssh_tunnel_agent.Classes {
     // based on http://indepthdev.azurewebsites.net/?p=73
     public abstract class EditableObject<T> : NotifyPropertyChangedBase, IEditableObject {
         private T Cache { get; set; }
+
+        [JsonIgnore]
         public bool isEditing { get; set; }
 
         public void BeginEdit() {
