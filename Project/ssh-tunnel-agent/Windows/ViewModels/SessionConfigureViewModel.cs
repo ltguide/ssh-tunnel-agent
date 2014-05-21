@@ -2,7 +2,9 @@
 using ssh_tunnel_agent.Classes;
 using ssh_tunnel_agent.Data;
 using System;
+using System.Diagnostics;
 using System.IO;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace ssh_tunnel_agent.Windows {
@@ -99,6 +101,30 @@ namespace ssh_tunnel_agent.Windows {
                                 textBox.Focus();
                                 textBox.CaretIndex = textBox.Text.Length;
                                 textBox.ScrollToEnd();
+                            }
+                        }
+                    ));
+            }
+        }
+
+        private string _puttygen;
+        private RelayCommand _launchPuTTYgenCommand;
+        public RelayCommand LaunchPuTTYgenCommand {
+            get {
+                return _launchPuTTYgenCommand ?? (
+                    _launchPuTTYgenCommand = new RelayCommand(
+                        () => {
+                            if ((_puttygen ?? (
+                                _puttygen = App.FindFile("puttygen.exe", new Version(0, 63))
+                            )) == null)
+                                MessageBox.Show("Failed to find up-to-date puttygen.exe.", "SSH Tunnel Agent", MessageBoxButton.OK, MessageBoxImage.Error);
+                            else {
+                                ProcessStartInfo startInfo = new ProcessStartInfo {
+                                    FileName = _puttygen,
+                                    UseShellExecute = false,
+                                };
+
+                                Process.Start(startInfo);
                             }
                         }
                     ));

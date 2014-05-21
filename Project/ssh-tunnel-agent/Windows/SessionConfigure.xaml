@@ -65,7 +65,11 @@
                         </StackPanel>
 
                         <StackPanel Grid.Row="1">
-                            <Label Content="Private Key File (PuTTYgen)" />
+                            <Label>
+                                <TextBlock>
+                                    Private Key File (<Hyperlink Command="{Binding LaunchPuTTYgenCommand}">PuTTYgen</Hyperlink>)
+                                </TextBlock>
+                            </Label>
                             <DockPanel HorizontalAlignment="Left">
                                 <TextBox Name="txtPrivateKeyFile" Width="270" Text="{Binding Session.PrivateKeyFile,UpdateSourceTrigger=PropertyChanged}" Tag="PuTTY Private Key Files (*.ppk)|*.ppk|All files (*.*)|*.*" VerticalAlignment="Center" HorizontalAlignment="Left"  />
                                 <Button Content="Browse" Command="{Binding BrowseCommand}" CommandParameter="{Binding ElementName=txtPrivateKeyFile}" Margin="4,0" />

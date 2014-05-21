@@ -55,29 +55,34 @@ namespace ssh_tunnel_agent {
                 return;
             }
 
-            string myPlink = "ssh-tunnel-agent-plink.exe";
-            if (matchFileVersion("plink.exe", new Version(0, 63))) {
-                Plink = "plink.exe";
-                try { File.Delete(myPlink); }
-                catch (Exception) { }
-            }
-            else if (upgradeFile(myPlink, new Version(0, 63)))
-                Plink = myPlink;
-            else {
-                shutdown("Failed to find up to date plink.exe or create " + myPlink);
-                return;
-            }
+            Plink = FindFile("plink.exe", new Version(0, 63));
+            if (Plink == null)
+                shutdown("Failed to find up-to-date plink.exe.");
         }
 
-        private bool upgradeFile(string name, Version version) {
-            if (matchFileVersion(name, version))
+        public static string FindFile(string file, Version version) {
+            string myFile = "ssh-tunnel-agent-" + file;
+            if (matchFileVersion(file, version)) {
+                try { File.Delete(myFile); }
+                catch (Exception) { }
+
+                return file;
+            }
+            else if (upgradeFile(file, myFile, version))
+                return myFile;
+            else
+                return null;
+        }
+
+        private static bool upgradeFile(string file, string myFile, Version version) {
+            if (matchFileVersion(myFile, version))
                 return true;
 
-            using (Stream resource = getEmbedded(name)) {
+            using (Stream resource = getEmbedded(file)) {
                 if (resource != null)
-                    using (FileStream file = new FileStream(name, FileMode.Create, FileAccess.Write)) {
+                    using (FileStream fileStream = new FileStream(myFile, FileMode.Create, FileAccess.Write)) {
                         try {
-                            resource.CopyTo(file);
+                            resource.CopyTo(fileStream);
                             return true;
                         }
                         catch (IOException) { }
@@ -87,7 +92,7 @@ namespace ssh_tunnel_agent {
             return false;
         }
 
-        private bool matchFileVersion(string name, Version version) {
+        private static bool matchFileVersion(string name, Version version) {
             if (File.Exists(name))
                 try {
                     return new Version(new string(
@@ -100,6 +105,10 @@ namespace ssh_tunnel_agent {
                 catch (FormatException) { }
 
             return false;
+        }
+
+        private static Stream getEmbedded(string name) {
+            return Assembly.GetExecutingAssembly().GetManifestResourceStream("ssh_tunnel_agent.Embedded." + name);
         }
 
         private void shutdown(string message) {
@@ -121,10 +130,6 @@ namespace ssh_tunnel_agent {
                 resource.Read(read, 0, (int)resource.Length);
                 return Assembly.Load(read);
             }
-        }
-
-        private Stream getEmbedded(string name) {
-            return Assembly.GetExecutingAssembly().GetManifestResourceStream("ssh_tunnel_agent.Embedded." + name);
         }
     }
 }

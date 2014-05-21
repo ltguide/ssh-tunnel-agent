@@ -165,9 +165,6 @@
     <EmbeddedResource Include="Embedded\Hardcodet.Wpf.TaskbarNotification.dll" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Embedded\ssh-tunnel-agent-plink.exe" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Assets\SessionStatus_CONNECTED.png" />
     <Resource Include="Assets\SessionStatus_ERROR.png" />
     <Resource Include="Assets\SessionStatus_DISCONNECTED.png" />
@@ -177,6 +174,10 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\network_receive.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Embedded\plink.exe" />
+    <EmbeddedResource Include="Embedded\puttygen.exe" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
