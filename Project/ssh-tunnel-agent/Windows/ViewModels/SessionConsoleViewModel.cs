@@ -73,6 +73,9 @@ namespace ssh_tunnel_agent.Windows {
         public ConsoleStatus Status {
             get { return _status; }
             set {
+                if (_status == value)
+                    return;
+
                 _status = value;
                 NotifyPropertyChanged();
 

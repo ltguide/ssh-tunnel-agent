@@ -29,14 +29,37 @@ namespace ssh_tunnel_agent.Windows {
         }
 
         public void DataContext_ConsoleStatusUpdated(object sender, ConsoleStatus status) {
-            if (status == ConsoleStatus.ACCESSGRANTED && !stayOpen)
-                InvokeIfRequired(() => Close());
-            else
-                InvokeIfRequired(() => Show());
+            InvokeIfRequired(() => {
+                if (status == ConsoleStatus.ACCESSGRANTED && !stayOpen)
+                    Close();
+                else
+                    Show();
+
+                if (status == ConsoleStatus.PASSWORD || status == ConsoleStatus.PRIVATEKEY) {
+                    txtStandardInput.Visibility = Visibility.Collapsed;
+                    txtPassword.Visibility = Visibility.Visible;
+                    txtPassword.Focus();
+                }
+                else if (txtPassword.IsVisible) {
+                    txtStandardInput.Visibility = Visibility.Visible;
+                    txtPassword.Visibility = Visibility.Collapsed;
+                    txtStandardInput.Focus();
+                }
+            });
         }
 
         private void txtStandardInput_KeyUp(object sender, KeyEventArgs e) {
             if (e.Key == Key.Enter) {
+                txtStandardInput.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+                e.Handled = true;
+            }
+        }
+
+        private void txtPassword_KeyUp(object sender, KeyEventArgs e) {
+            if (e.Key == Key.Enter) {
+                txtStandardInput.Text = txtPassword.Password;
+                txtPassword.Password = String.Empty;
+
                 txtStandardInput.GetBindingExpression(TextBox.TextProperty).UpdateSource();
                 e.Handled = true;
             }
