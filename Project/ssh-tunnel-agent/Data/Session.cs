@@ -16,8 +16,8 @@ namespace ssh_tunnel_agent.Data {
         private Timer _reconnectTimer;
         private SessionConsole _sessionConsole;
 
-        [JsonIgnore]
         private SessionStatus _status;
+        [JsonIgnore]
         public SessionStatus Status {
             get { return _status; }
             set {
