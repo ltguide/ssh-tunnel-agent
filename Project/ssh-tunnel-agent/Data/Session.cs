@@ -1,4 +1,5 @@
-﻿using ssh_tunnel_agent.Classes;
+﻿using Newtonsoft.Json;
+using ssh_tunnel_agent.Classes;
 using ssh_tunnel_agent.Tray;
 using ssh_tunnel_agent.Windows;
 using System;
@@ -15,6 +16,7 @@ namespace ssh_tunnel_agent.Data {
         private Timer _reconnectTimer;
         private SessionConsole _sessionConsole;
 
+        [JsonIgnore]
         private SessionStatus _status;
         public SessionStatus Status {
             get { return _status; }
