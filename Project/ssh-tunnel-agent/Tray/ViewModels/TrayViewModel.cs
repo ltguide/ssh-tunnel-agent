@@ -6,7 +6,6 @@ using ssh_tunnel_agent.Data;
 using ssh_tunnel_agent.Windows;
 using System;
 using System.Collections.ObjectModel;
-using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 
@@ -44,7 +43,7 @@ namespace ssh_tunnel_agent.Tray {
             get {
                 return _exitApplicationCommand ?? (
                     _exitApplicationCommand = new RelayCommand(
-                        () => Application.Current.Shutdown()
+                        () => App.Current.Shutdown()
                     ));
             }
         }

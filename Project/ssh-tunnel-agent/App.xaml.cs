@@ -20,7 +20,7 @@ namespace ssh_tunnel_agent {
         public static TaskbarIcon TrayIcon {
             get {
                 if (_trayIcon == null)
-                    _trayIcon = (TaskbarIcon)Application.Current.FindResource("TrayIcon");
+                    _trayIcon = (TaskbarIcon)App.Current.FindResource("TrayIcon");
 
                 return _trayIcon;
             }
@@ -113,7 +113,7 @@ namespace ssh_tunnel_agent {
 
         private void shutdown(string message) {
             MessageBox.Show(message, "SSH Tunnel Agent", MessageBoxButton.OK, MessageBoxImage.Error);
-            Application.Current.Shutdown();
+            App.Current.Shutdown();
         }
 
         public Assembly CurrentDomain_AssemblyResolve(Object sender, ResolveEventArgs args) {

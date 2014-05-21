@@ -30,9 +30,9 @@ namespace ssh_tunnel_agent.Windows {
 
         public void DataContext_ConsoleStatusUpdated(object sender, ConsoleStatus status) {
             if (status == ConsoleStatus.ACCESSGRANTED && !stayOpen)
-                Invoke(() => Close());
+                InvokeIfRequired(() => Close());
             else
-                Invoke(() => Show());
+                InvokeIfRequired(() => Show());
         }
 
         private void txtStandardInput_KeyUp(object sender, KeyEventArgs e) {
@@ -54,12 +54,15 @@ namespace ssh_tunnel_agent.Windows {
             txtStandardInput.Focus();
         }
 
-        private void Invoke(Action action) {
-            Dispatcher.BeginInvoke(action);
+        private void InvokeIfRequired(Action action) {
+            if (!Dispatcher.CheckAccess())
+                Dispatcher.Invoke(action);
+            else
+                action();
         }
 
         public void InvokeClose() {
-            Invoke(() => Close());
+            InvokeIfRequired(() => Close());
         }
     }
 }

@@ -200,7 +200,7 @@ namespace ssh_tunnel_agent.Data {
             _process.Exited += process_Exited;
 
             if (_sessionConsole != null)
-                _sessionConsole.Close();
+                _sessionConsole.InvokeClose();
 
             _sessionConsole = new SessionConsole(_process, this);
 
@@ -223,7 +223,7 @@ namespace ssh_tunnel_agent.Data {
             _process.Close();
 
             if (_sessionConsole != null)
-                _sessionConsole.Close();
+                _sessionConsole.InvokeClose();
 
             Status = SessionStatus.DISCONNECTED;
         }
@@ -243,8 +243,10 @@ namespace ssh_tunnel_agent.Data {
 
                     if (AutoReconnect)
                         (_reconnectTimer ?? (
-                                _reconnectTimer = new Timer(state => Connect())
-                            )).Change(new Random().Next(500, 5000), Timeout.Infinite);
+                            _reconnectTimer = new Timer(
+                                state => App.Current.Dispatcher.Invoke(
+                                    () => Connect()
+                            )))).Change(new Random().Next(4000, 10000), Timeout.Infinite);
                 }
 
                 _process.Close();
