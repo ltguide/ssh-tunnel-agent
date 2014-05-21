@@ -29,5 +29,11 @@ namespace ssh_tunnel_agent.Windows {
         private void Window_Loaded(object sender, RoutedEventArgs e) {
             txtSessionName.Focus();
         }
+
+        private void Window_ValidationError(object sender, ValidationErrorEventArgs e) {
+            bool valid = !(e.Action == ValidationErrorEventAction.Added);
+
+            ((Control)e.Source).ToolTip = valid ? null : e.Error.ErrorContent.ToString();
+        }
     }
 }

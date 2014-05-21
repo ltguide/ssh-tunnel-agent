@@ -28,22 +28,18 @@ namespace ssh_tunnel_agent.Windows {
                 App.Current.MainWindow = null;
         }
 
-        void DataContext_ConsoleStatusUpdated(object sender, ConsoleStatus status) {
-            Dispatcher.BeginInvoke(new Action(
-                    () => {
-                        if (status == ConsoleStatus.ACCESSGRANTED && !stayOpen)
-                            Close();
-                        else
-                            Show();
-                    }
-                ));
+        public void DataContext_ConsoleStatusUpdated(object sender, ConsoleStatus status) {
+            if (status == ConsoleStatus.ACCESSGRANTED && !stayOpen)
+                Invoke(() => Close());
+            else
+                Invoke(() => Show());
         }
 
         private void txtStandardInput_KeyUp(object sender, KeyEventArgs e) {
-            if (e.Key != Key.Enter)
-                return;
-
-            txtStandardInput.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+            if (e.Key == Key.Enter) {
+                txtStandardInput.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+                e.Handled = true;
+            }
         }
 
         private void StandardStream_TargetUpdated(object sender, DataTransferEventArgs e) {
@@ -56,6 +52,14 @@ namespace ssh_tunnel_agent.Windows {
 
         private void Window_Loaded(object sender, RoutedEventArgs e) {
             txtStandardInput.Focus();
+        }
+
+        private void Invoke(Action action) {
+            Dispatcher.BeginInvoke(action);
+        }
+
+        public void InvokeClose() {
+            Invoke(() => Close());
         }
     }
 }

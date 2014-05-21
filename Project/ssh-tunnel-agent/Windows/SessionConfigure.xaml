@@ -10,7 +10,8 @@
         Closing="Window_Closing"
         ResizeMode="NoResize"
         SizeToContent="WidthAndHeight"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        Validation.Error="Window_ValidationError">
     <StackPanel Name="frame">
         <TextBlock FontWeight="Bold" Foreground="{DynamicResource {x:Static SystemColors.MenuTextBrushKey}}" Margin="4" Text="{Binding Title}" />
         <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="0,1,0,3" />
@@ -129,17 +130,25 @@
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Grid.Row="0" Grid.Column="0">
                                         <Label Content="IP Address" />
-                                        <TextBox Text="{Binding Tunnel.ListenIP,UpdateSourceTrigger=PropertyChanged}" Width="100" HorizontalAlignment="Left" />
+                                        <TextBox Text="{Binding Tunnel.ListenIP,UpdateSourceTrigger=PropertyChanged,ValidatesOnDataErrors=True,NotifyOnValidationError=True}" Width="100" HorizontalAlignment="Left" />
                                     </StackPanel>
                                     <StackPanel Grid.Row="0" Grid.Column="1" Margin="10,0,0,0">
                                         <Label Content="Port" />
-                                        <TextBox Text="{Binding Tunnel.ListenPort,UpdateSourceTrigger=PropertyChanged}" Width="40" HorizontalAlignment="Left" />
+                                        <TextBox Text="{Binding Tunnel.ListenPort,UpdateSourceTrigger=PropertyChanged,ValidatesOnDataErrors=True,NotifyOnValidationError=True}" Width="40" HorizontalAlignment="Left" />
                                     </StackPanel>
                                 </Grid>
                             </GroupBox>
 
                             <GroupBox Header="Destination" HorizontalAlignment="Left" Margin="7,0,0,0">
-                                <!-- hide if Type is DYNAMIC -->
+                                <GroupBox.Style>
+                                    <Style TargetType="GroupBox">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Tunnel.Type}" Value="{x:Static localData:TunnelType.DYNAMIC}">
+                                                <Setter Property="IsEnabled" Value="False" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </GroupBox.Style>
                                 <Grid Margin="4">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
@@ -147,19 +156,23 @@
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Grid.Row="0" Grid.Column="0">
                                         <Label Content="Host or IP address" />
-                                        <TextBox Text="{Binding Tunnel.Host,UpdateSourceTrigger=PropertyChanged}" Width="100" HorizontalAlignment="Left" />
+                                        <TextBox Text="{Binding Tunnel.Host,UpdateSourceTrigger=PropertyChanged,ValidatesOnDataErrors=True,NotifyOnValidationError=True}" Width="100" HorizontalAlignment="Left" />
                                     </StackPanel>
                                     <StackPanel Grid.Row="0" Grid.Column="1" Margin="10,0,0,0">
                                         <Label Content="Port" />
-                                        <TextBox Text="{Binding Tunnel.Port,UpdateSourceTrigger=PropertyChanged}" Width="40" HorizontalAlignment="Left" />
+                                        <TextBox Text="{Binding Tunnel.Port,UpdateSourceTrigger=PropertyChanged,ValidatesOnDataErrors=True,NotifyOnValidationError=True}" Width="40" HorizontalAlignment="Left" />
                                     </StackPanel>
                                 </Grid>
                             </GroupBox>
                         </StackPanel>
 
-                        <DockPanel Margin="0,4,0,-4" HorizontalAlignment="Right">
-                            <Button Content="Add" Command="{Binding AddTunnelCommand}" HorizontalAlignment="Left" />
-                            <Button Content="Clear" Command="{Binding ClearTunnelCommand}" HorizontalAlignment="Left" />
+                        <DockPanel Margin="0,4,0,-4">
+                            <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Text="0.0.0.0 matches all network interfaces" />
+                            <DockPanel  HorizontalAlignment="Right">
+
+                                <Button Content="Add" Command="{Binding AddTunnelCommand}" HorizontalAlignment="Left" />
+                                <Button Content="Clear" Command="{Binding ClearTunnelCommand}" HorizontalAlignment="Left" />
+                            </DockPanel>
                         </DockPanel>
 
                     </StackPanel>

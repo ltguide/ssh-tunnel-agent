@@ -16,7 +16,7 @@
         </Grid.RowDefinitions>
         <TextBox Grid.Row="0" IsReadOnly="True" Text="{Binding StandardError,NotifyOnTargetUpdated=True}" Margin="0,0,0,7" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TargetUpdated="StandardStream_TargetUpdated" />
 
-        <TextBox Grid.Row="1" IsReadOnly="True" Text="{Binding StandardOutput,NotifyOnTargetUpdated=True}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TargetUpdated="StandardStream_TargetUpdated" />
+        <TextBox Grid.Row="1" IsReadOnly="True" Text="{Binding StandardOutput,NotifyOnTargetUpdated=True}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TargetUpdated="StandardStream_TargetUpdated" FontFamily="Courier New" />
 
         <TextBox Grid.Row="2" Margin="0,4,0,0" Name="txtStandardInput" IsEnabled="{Binding StandardInputEnabled}" Text="{Binding StandardInput, UpdateSourceTrigger=Explicit}" KeyUp="txtStandardInput_KeyUp" VerticalAlignment="Top" />
     </Grid>

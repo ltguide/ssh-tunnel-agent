@@ -108,15 +108,18 @@ namespace ssh_tunnel_agent.Data {
             RemoteCommandFile = String.Empty;
             RemoteCommandSubsystem = false;
         }
-
+        private string escapeArg(string arg) {
+            arg = arg.Trim();
+            return String.Format("{1}{0}{1}", arg.Replace("\"", "\\\""), arg.Contains(" ") ? "\"" : String.Empty);
+        }
         private string getArguments() {
             string command = String.Empty;
             StringBuilder sb = new StringBuilder("-v -ssh");
 
             if (Username != String.Empty)
-                sb.AppendFormat(" -l {0}", Username); //todo quote
+                sb.AppendFormat(" -l {0}", escapeArg(Username));
 
-            sb.AppendFormat(" -P {0}", Port); //todo quote
+            sb.AppendFormat(" -P {0}", Port);
 
             if (Compression)
                 sb.Append(" -C");
@@ -128,7 +131,7 @@ namespace ssh_tunnel_agent.Data {
                 sb.Append(" -N");
 
             if (PrivateKeyFile != String.Empty)
-                sb.AppendFormat(" -i {0}", PrivateKeyFile); //todo quote
+                sb.AppendFormat(" -i {0}", escapeArg(PrivateKeyFile));
 
             sb.Append(UsePageant ? " -agent" : " -noagent");
 
@@ -136,19 +139,19 @@ namespace ssh_tunnel_agent.Data {
                 if (RemoteCommand != String.Empty)
                     command = RemoteCommand;
                 else if (RemoteCommandFile != String.Empty)
-                    sb.AppendFormat(" -m {0}", RemoteCommandFile); //todo quote
+                    sb.AppendFormat(" -m {0}", escapeArg(RemoteCommandFile));
 
                 if (RemoteCommandSubsystem)
                     sb.Append(" -s");
             }
             else
                 foreach (Tunnel tunnel in Tunnels)
-                    sb.Append(tunnel.ToString(" -{0} {1}:{2}", ":{3}:{4}")); //todo quote
+                    sb.Append(tunnel.ToString(" -{0} {1}:{2}", ":{3}:{4}"));
 
-            sb.AppendFormat(" {0}", Host); //todo quote
+            sb.AppendFormat(" {0}", escapeArg(Host));
 
             if (command != String.Empty)
-                sb.AppendFormat(" {0}", command); //todo quote
+                sb.AppendFormat(" {0}", escapeArg(command));
 
             return sb.ToString();
         }
@@ -221,12 +224,15 @@ namespace ssh_tunnel_agent.Data {
         }
 
         private void process_Exited(object sender, EventArgs e) {
-            // todo test commands ExitCode to preserve Console
             if (!_processExit) {
                 Debug.WriteLine("exit: \"" + Name + "\"; " + _process.ExitCode);
 
-                if (_process.ExitCode == 0)
+                if (_process.ExitCode == 0) {
                     Status = SessionStatus.DISCONNECTED;
+
+                    if (_sessionConsole != null)
+                        _sessionConsole.InvokeClose();
+                }
                 else {
                     Status = SessionStatus.ERROR;
 

@@ -39,7 +39,19 @@ namespace ssh_tunnel_agent.Windows {
                             Session.Tunnels.Add(Tunnel);
                             Tunnel = new Tunnel();
                         },
-                        () => !Session.Tunnels.Contains(Tunnel) && Tunnel.ListenIP != String.Empty && Tunnel.ListenPort != 0 && (Tunnel.Type == TunnelType.DYNAMIC || (Tunnel.Port != 0 && Tunnel.Host != String.Empty))
+                        () => {
+                            if (Session.Tunnels.Contains(Tunnel))
+                                return false;
+
+                            if (String.IsNullOrEmpty(Tunnel.ListenIP) || Tunnel["ListenIP"] != null || String.IsNullOrEmpty(Tunnel.ListenPort) || Tunnel["ListenPort"] != null)
+                                return false;
+
+                            if (Tunnel.Type != TunnelType.DYNAMIC)
+                                if (String.IsNullOrEmpty(Tunnel.Host) || Tunnel["Host"] != null || String.IsNullOrEmpty(Tunnel.Port) || Tunnel["Port"] != null)
+                                    return false;
+
+                            return true;
+                        }
                     ));
             }
         }

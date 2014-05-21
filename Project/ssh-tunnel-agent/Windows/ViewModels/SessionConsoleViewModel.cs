@@ -50,7 +50,7 @@ namespace ssh_tunnel_agent.Windows {
                         StandardOutput += Environment.NewLine;
                 }
 
-                Process.StandardInput.WriteLine(value);
+                Process.StandardInput.Write(value + "\n");
                 _standardInput = String.Empty;
                 NotifyPropertyChanged();
             }
@@ -100,11 +100,8 @@ namespace ssh_tunnel_agent.Windows {
                     return;
 
                 int read = await streamReader.ReadAsync(buffer, 0, 1024);
-                if (read > 0) {
-                    char[] data = new char[read];
-                    Array.Copy(buffer, data, read);
-                    StandardDataReceived(streamReader, new StandardDataReceivedEventArgs(type, data));
-                }
+                if (read > 0)
+                    StandardDataReceived(streamReader, new StandardDataReceivedEventArgs(type, new string(buffer, 0, read)));
             }
 
             streamReader.Close();
@@ -113,23 +110,53 @@ namespace ssh_tunnel_agent.Windows {
 
         private void session_StandardDataReceived(object sender, StandardDataReceivedEventArgs e) {
             if (e.Type == StandardStreamType.OUTPUT) {
-                if (e.Value == "login as: ")
+                if (e.Data == "login as: ")
                     Status = ConsoleStatus.LOGINAS;
-                else if (e.Value.EndsWith("'s password: "))
+                else if (e.Data.EndsWith("'s password: "))
                     Status = ConsoleStatus.PASSWORD;
 
                 if (Status != ConsoleStatus.ACCESSGRANTED)
-                    StandardOutput += e.Value;
+                    StandardOutput += e.Data;
                 else {
-                    // todo strip ESCAPE codes
+                    char[] data = new char[e.Data.Length];
+                    int read = 0;
 
-                    StandardOutput += e.Value;
+                    bool gotESC = false;
+                    bool gotOSC = false;
+                    bool gotCSI = false;
+
+                    for (var i = 0; i < e.Data.Length; i++) {
+                        char c = e.Data[i];
+
+                        if (gotOSC) {
+                            if (c == 7) // BEL
+                                gotOSC = false;
+                        }
+                        else if (gotCSI) {
+                            if (c >= 64 && c <= 126) // @ to ~
+                                gotCSI = false;
+                        }
+                        else if (gotESC) {
+                            if (c == 91) // [
+                                gotCSI = true;
+                            else if (c == 93) // ]
+                                gotOSC = true;
+
+                            gotESC = false;
+                        }
+                        else if (c == 27) // ESC
+                            gotESC = true;
+                        else
+                            data[read++] = c;
+                    }
+
+                    StandardOutput += new string(data, 0, read);
                 }
             }
 
             else if (e.Type == StandardStreamType.ERROR) {
                 if (Status != ConsoleStatus.ACCESSGRANTED) {
-                    string[] lines = e.Value.Split(_splitby, StringSplitOptions.RemoveEmptyEntries);
+                    string[] lines = e.Data.Split(_splitby, StringSplitOptions.RemoveEmptyEntries);
 
                     if (Array.IndexOf(lines, "Store key in cache? (y/n) ") >= 0)
                         Status = ConsoleStatus.STOREHOST;
@@ -139,7 +166,7 @@ namespace ssh_tunnel_agent.Windows {
                         Status = ConsoleStatus.ACCESSGRANTED;
                 }
 
-                StandardError += e.Value;
+                StandardError += e.Data;
             }
         }
     }
