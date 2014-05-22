@@ -1,5 +1,4 @@
 ﻿using System.Configuration;
-using System.Windows;
 
 namespace ssh_tunnel_agent.Config {
     public class Settings {
@@ -45,7 +44,7 @@ namespace ssh_tunnel_agent.Config {
                 _config.Save(ConfigurationSaveMode.Modified);
             }
             catch (ConfigurationErrorsException ex) {
-                MessageBox.Show(ex.Message, "Error Saving", MessageBoxButton.OK, MessageBoxImage.Error);
+                App.showErrorMessage(ex.Message);
             }
         }
     }

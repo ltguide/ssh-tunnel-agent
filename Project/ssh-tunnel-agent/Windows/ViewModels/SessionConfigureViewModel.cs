@@ -4,7 +4,6 @@ using ssh_tunnel_agent.Data;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Windows;
 using System.Windows.Controls;
 
 namespace ssh_tunnel_agent.Windows {
@@ -117,7 +116,7 @@ namespace ssh_tunnel_agent.Windows {
                             if ((_puttygen ?? (
                                 _puttygen = App.FindFile("puttygen.exe", new Version(0, 63))
                             )) == null)
-                                MessageBox.Show("Failed to find up-to-date puttygen.exe.", "SSH Tunnel Agent", MessageBoxButton.OK, MessageBoxImage.Error);
+                                App.showErrorMessage("Failed to find up-to-date puttygen.exe.");
                             else {
                                 ProcessStartInfo startInfo = new ProcessStartInfo {
                                     FileName = _puttygen,

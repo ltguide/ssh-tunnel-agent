@@ -51,13 +51,16 @@ namespace ssh_tunnel_agent {
                 FindResource("TrayIcon");
             }
             catch (Exception) {
-                shutdown("Unable to load required embedded extensions.");
+                App.showErrorMessage("Unable to load required embedded extensions.", false);
+                App.Current.Shutdown();
                 return;
             }
 
             Plink = FindFile("plink.exe", new Version(0, 63));
-            if (Plink == null)
-                shutdown("Failed to find up-to-date plink.exe.");
+            if (Plink == null) {
+                App.showErrorMessage("Failed to find up-to-date plink.exe.");
+                App.Current.Shutdown();
+            }
         }
 
         public static string FindFile(string file, Version version) {
@@ -80,13 +83,13 @@ namespace ssh_tunnel_agent {
 
             using (Stream resource = getEmbedded(file)) {
                 if (resource != null)
-                    using (FileStream fileStream = new FileStream(myFile, FileMode.Create, FileAccess.Write)) {
-                        try {
+                    try {
+                        using (FileStream fileStream = new FileStream(myFile, FileMode.Create, FileAccess.Write)) {
                             resource.CopyTo(fileStream);
                             return true;
                         }
-                        catch (IOException) { }
                     }
+                    catch (Exception) { }
             }
 
             return false;
@@ -111,9 +114,13 @@ namespace ssh_tunnel_agent {
             return Assembly.GetExecutingAssembly().GetManifestResourceStream("ssh_tunnel_agent.Embedded." + name);
         }
 
-        private void shutdown(string message) {
-            MessageBox.Show(message, "SSH Tunnel Agent", MessageBoxButton.OK, MessageBoxImage.Error);
-            App.Current.Shutdown();
+        public static void showErrorMessage(string message, bool needAdmin = true) {
+            MessageBox.Show(
+                String.Format(needAdmin ? "{0}{1}{1}{2}" : "{0}", message, Environment.NewLine, @"If this program is located in a system folder (i.e. C:\Program Files\* or C:\), then it needs to be run as an administrator to write files. Or you could just move it to a user (i.e. Documents) folder."),
+                "SSH Tunnel Agent",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error
+            );
         }
 
         public Assembly CurrentDomain_AssemblyResolve(Object sender, ResolveEventArgs args) {
