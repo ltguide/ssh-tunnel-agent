@@ -799,10 +799,10 @@ footer .owner p a {
 
 .markdown-body pre.lines {
   font-size: 12px;
-  margin:-10px 10px 0 0px; /*0 10px 0 -20px;*/
+  margin:0 10px 0 0; /*0 10px 0 -20px;*/
   font-family: monospace, monospace;
   line-height: 21px;
-  padding: 10px;
+  padding:0 10px;
   float:  left;
   display: block;
   text-align: right;
