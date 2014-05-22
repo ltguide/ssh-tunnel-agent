@@ -7,12 +7,12 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace ssh_tunnel_agent.Windows {
-    public class SessionConsoleViewModel : NotifyPropertyChangedBase {
+    public class SessionConsoleViewModel : NotifyPropertyChangedBase, IDisposable {
         private event EventHandler<StandardDataReceivedEventArgs> StandardDataReceived;
         private CancellationTokenSource _tokenSource;
         private string[] _splitby = new string[] { "\r\n" };
 
-        public event EventHandler<ConsoleStatus> ConsoleStatusUpdated;
+        public event EventHandler<ConsoleStatusChangedEventArgs> ConsoleStatusChanged;
 
         public Process Process { get; private set; }
         public string Title { get; private set; }
@@ -79,8 +79,8 @@ namespace ssh_tunnel_agent.Windows {
                 _status = value;
                 NotifyPropertyChanged();
 
-                if (ConsoleStatusUpdated != null)
-                    ConsoleStatusUpdated(this, _status);
+                if (ConsoleStatusChanged != null)
+                    ConsoleStatusChanged(this, new ConsoleStatusChangedEventArgs(_status));
             }
         }
 
@@ -173,6 +173,17 @@ namespace ssh_tunnel_agent.Windows {
                 }
 
                 StandardError += e.Data;
+            }
+        }
+
+        public void Dispose() {
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing) {
+            if (disposing) {
+                if (_tokenSource != null)
+                    _tokenSource.Dispose();
             }
         }
     }

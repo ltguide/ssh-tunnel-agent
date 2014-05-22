@@ -20,7 +20,7 @@ namespace ssh_tunnel_agent.Windows {
             stayOpen = session.StartShell;
 
             SessionConsoleViewModel viewModel = new SessionConsoleViewModel(process, session.Name);
-            viewModel.ConsoleStatusUpdated += DataContext_ConsoleStatusUpdated;
+            viewModel.ConsoleStatusChanged += DataContext_ConsoleStatusChanged;
 
             DataContext = viewModel;
 
@@ -28,14 +28,14 @@ namespace ssh_tunnel_agent.Windows {
                 App.Current.MainWindow = null;
         }
 
-        public void DataContext_ConsoleStatusUpdated(object sender, ConsoleStatus status) {
+        public void DataContext_ConsoleStatusChanged(object sender, ConsoleStatusChangedEventArgs e) {
             InvokeIfRequired(() => {
-                if (status == ConsoleStatus.ACCESSGRANTED && !stayOpen)
+                if (e.Status == ConsoleStatus.ACCESSGRANTED && !stayOpen)
                     Close();
                 else
                     Show();
 
-                if (status == ConsoleStatus.PASSWORD || status == ConsoleStatus.PRIVATEKEY) {
+                if (e.Status == ConsoleStatus.PASSWORD || e.Status == ConsoleStatus.PRIVATEKEY) {
                     txtStandardInput.Visibility = Visibility.Collapsed;
                     txtPassword.Visibility = Visibility.Visible;
                     txtPassword.Focus();
