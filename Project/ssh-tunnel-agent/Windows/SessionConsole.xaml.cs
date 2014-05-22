@@ -17,7 +17,7 @@ namespace ssh_tunnel_agent.Windows {
         public SessionConsole(Process process, Session session) {
             InitializeComponent();
 
-            stayOpen = session.StartShell;
+            stayOpen = session.StartShell || session.SendCommands;
 
             SessionConsoleViewModel viewModel = new SessionConsoleViewModel(process, session.Name);
             viewModel.ConsoleStatusChanged += DataContext_ConsoleStatusChanged;

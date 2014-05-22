@@ -206,9 +206,8 @@ namespace ssh_tunnel_agent.Data {
 
             _sessionConsole = new SessionConsole(_process, this);
 
-#if DEBUG
-            _sessionConsole.Show();
-#endif
+            if (SendCommands)
+                _sessionConsole.Show();
 
             Status = SessionStatus.CONNECTED;
         }
@@ -243,7 +242,7 @@ namespace ssh_tunnel_agent.Data {
                 else {
                     Status = SessionStatus.ERROR;
 
-                    if (AutoReconnect)
+                    if (AutoReconnect && !SendCommands)
                         (_reconnectTimer ?? (
                             _reconnectTimer = new Timer(
                                 state => App.Current.Dispatcher.Invoke(
