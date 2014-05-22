@@ -25,7 +25,7 @@
       <h1 class="title">SSH Tunnel Agent</h1>
     </header>
     <div id="container">
-      <p class="tagline"></p>
+      <p class="tagline">tagline goes here</p>
       <div id="main" role="main">
         <div class="download-bar">
         <div class="inner">
@@ -40,26 +40,60 @@
 
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ut turpis egestas risus gravida tincidunt vitae sed purus. Vivamus ut nisi porttitor, interdum purus nec, egestas ipsum. Morbi a interdum erat. Phasellus blandit ut enim mollis fermentum. Etiam vestibulum, purus.</p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
+<!--<pre><code>x
+x
+x
+</code></pre>-->
 
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tincidunt fringilla vestibulum. Donec id rutrum.</p>
 
-<h3><a name="such-and-such" class="anchor" href="#such-and-such"><span class="octicon octicon-link"></span></a>Such and Such</h3>
+<h3><a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h3>
 
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec lobortis mollis condimentum. Quisque ac egestas leo. Integer eu leo lacinia, auctor enim eget, malesuada diam. Aenean aliquet quis quam sed cursus. Mauris ac nisi sagittis, volutpat eros ut, varius quam. Nunc a volutpat urna. Donec blandit nulla a libero euismod.</p>
+<p>This program requires at least the <a href="http://www.microsoft.com/net/downloads">.NET Framework 4.5</a> which is included with Windows 8. Windows 7 SP1 and Windows Vista SP2 are compatible with the framework, but it must be installed separately or obtained through Windows Update.</p>
 
-<h3><a name="screenshots" class="anchor" href="#screenshots"><span class="octicon octicon-link"></span></a>Screenshots</h3>
+<h3><a name="visual-instructions" class="anchor" href="#visual-instructions"><span class="octicon octicon-link"></span></a>Visual Instructions</h3>
 
-<p><img src="screenshots/tray_tooltip.png" alt="" /></p>
-<p><img src="screenshots/tray_contextmenu.png" alt="" /></p>
-<p><img src="screenshots/tray_popup.png" alt="" /></p>
-<p><img src="screenshots/popup_contextmenu.png" alt="" /></p>
-<p><img src="screenshots/add_session-tunnel.png" alt="" /></p>
-<p><img src="screenshots/add_session-data.png" alt="" /></p>
-<p><img src="screenshots/session_console.png" alt="" /></p>
+<p>
+	Hover over the Tray Icon for a Tooltip containing the currently connected sessions.
+	<br />
+	<img src="screenshots/tray_tooltip.png" alt="" />
+</p>
+<hr />
+<p>
+	Right-click the Tray Icon to toggle the only application-wide setting or to Exit.
+	<br />
+	<img src="screenshots/tray_contextmenu.png" alt="" />
+</p>
+<hr />
+<p>
+	Left/Double-click the Tray Icon for the session control popup. It displays all the sesions and whether they are connected, disconnected, or had an error. The "Add session" link will open the "Configure Session" window. Double-clicking on a session will connect or disconnect that session.
+	<br />
+	<img src="screenshots/tray_popup.png" alt="" />
+</p>
+<hr />
+<p>
+	In the session control popup, right-click on a session to toggle its connection state or edit its configuration. You cannot edit a session that is currently connected.
+	<br />
+	<img src="screenshots/popup_contextmenu.png" alt="" />
+</p>
+<hr />
+<p>
+	In the session control popup, click "Add session" or right-click a session and choose Configure to open the "Configure Session" window. You can click the "Remove session" link in the bottom-left to remove a session.
+	<br />
+	<img src="screenshots/add_session-tunnel.png" alt="" />
+</p>
+<hr />
+<p>
+	In the "Configure Session" window, check the "Send Data instead of opening Tunnel" checkbox to hide the tunnel options and show the remote command options. Sessions with remote commands will change status to Disconnected if they complete successfully and Error if they fail.
+	<br />
+	<img src="screenshots/add_session-data.png" alt="" />
+</p>
+<hr />
+<p>
+	The "Session Console" windows will always be displayed if the "Start a Shell" option is checked, if any input is required after a session is started, or if a session is sending remote commands. Closing the "Session Console" does not disconnect the session. The window cannot be reopened without reconnecting.
+	<br />
+	<img src="screenshots/session_console.png" alt="" />
+</p>
 
         </article>
       </div>
