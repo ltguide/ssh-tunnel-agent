@@ -2,7 +2,7 @@
 $(document).ready(function(){
 
   // putting lines by the pre blocks
-  $("pre").each(function(){
+  $("pre code").each(function(){
     var pre = $(this).text().split("\n");
     var lines = new Array(pre.length+1);
     for(var i = 0; i < pre.length; i++) {
@@ -19,6 +19,7 @@ $(document).ready(function(){
     $(this).before("<pre class='lines'>" + lines.join("\n") + "</pre>");
   });
 
+  /*
   var headings = [];
 
   var collectHeaders = function(){
@@ -48,5 +49,6 @@ $(document).ready(function(){
     $(window).scrollTop(0);
     return false;
   })
+  */
 });
 })(jQuery)
