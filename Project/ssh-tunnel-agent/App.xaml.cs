@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using System.Windows;
 
 namespace ssh_tunnel_agent {
@@ -14,6 +15,8 @@ namespace ssh_tunnel_agent {
     // Public Domain by Various - http://tango.freedesktop.org/The_People
 
     public partial class App : Application {
+        private static Mutex _mutex;
+
         public static string Plink { get; set; }
 
         private static TaskbarIcon _trayIcon;
@@ -45,6 +48,14 @@ namespace ssh_tunnel_agent {
         }
 
         private void Application_Startup(object sender, StartupEventArgs e) {
+            bool createdNew;
+            _mutex = new Mutex(true, "{BBCB93D1-0DF2-4BB9-8825-D111A44D33FA}", out createdNew);
+            if (!createdNew) {
+                //MessageBox.Show("This program is accessed through its tray icon next to the clock.", "SSH Tunnel Agent", MessageBoxButton.OK, MessageBoxImage.Information);
+                App.Current.Shutdown();
+                return;
+            }
+
             AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
 
             try {
