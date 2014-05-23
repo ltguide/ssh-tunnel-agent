@@ -179,6 +179,8 @@ namespace ssh_tunnel_agent.Windows {
                     string output = new string(data, 0, read);
                     if (output.EndsWith("Password: "))
                         OnPasswordRequested();
+                    else if (output.StartsWith("[sudo] password for "))
+                        OnPasswordRequested();
 
                     StandardOutput += output;
                 }
