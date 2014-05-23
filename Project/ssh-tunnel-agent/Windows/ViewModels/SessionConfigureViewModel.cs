@@ -28,7 +28,6 @@ namespace ssh_tunnel_agent.Windows {
                 Title = "New Session";
 
             Tunnel = new Tunnel();
-            //Tunnel = new Tunnel() { Type = TunnelType.REMOTE, ListenIP = "192.168.1.105", ListenPort = 4444, Host = "10.5.205.235", Port = 3389 };
         }
 
         private RelayCommand _addTunnelCommand;

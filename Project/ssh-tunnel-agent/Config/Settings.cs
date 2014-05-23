@@ -27,9 +27,9 @@ namespace ssh_tunnel_agent.Config {
             Get<TextConfigurationElement>(key).Value = value;
         }
 
-        public void Set(string key, object value) {
+        /*public void Set(string key, object value) {
             typeof(SettingsSection).GetProperty(key).SetValue(_settings, value);
-        }
+        }*/
 
         public string GetCData(string key) {
             return Get<TextConfigurationElement>(key).Value;

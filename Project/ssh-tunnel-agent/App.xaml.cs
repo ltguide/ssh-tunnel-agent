@@ -51,13 +51,13 @@ namespace ssh_tunnel_agent {
                 FindResource("TrayIcon");
             }
             catch (Exception) {
-                App.showErrorMessage("Unable to load required embedded extensions.", false);
+                App.showErrorMessage("Unable to load a required embedded extension.", false);
                 App.Current.Shutdown();
                 return;
             }
 
             Plink = FindFile("plink.exe", new Version(0, 63));
-            if (Plink == null) {
+            if (Plink == null) { // not worth continuing from here :(
                 App.showErrorMessage("Failed to find up-to-date plink.exe.");
                 App.Current.Shutdown();
             }
@@ -114,20 +114,11 @@ namespace ssh_tunnel_agent {
             return Assembly.GetExecutingAssembly().GetManifestResourceStream("ssh_tunnel_agent.Embedded." + name);
         }
 
-        public static void showErrorMessage(string message, bool needAdmin = true) {
-            MessageBox.Show(
-                String.Format(needAdmin ? "{0}{1}{1}{2}" : "{0}", message, Environment.NewLine, @"If this program is located in a system folder (i.e. C:\Program Files\* or C:\), then it needs to be run as an administrator to write files. Or you could just move it to a user (i.e. Documents) folder."),
-                "SSH Tunnel Agent",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error
-            );
-        }
-
         public Assembly CurrentDomain_AssemblyResolve(Object sender, ResolveEventArgs args) {
             string name = args.Name.Substring(0, args.Name.IndexOf(',')) + @".dll";
 
-            if (name != "Hardcodet.Wpf.TaskbarNotification.dll" && name != "Newtonsoft.Json.dll")
-                return null;
+            //if (name != "Hardcodet.Wpf.TaskbarNotification.dll" && name != "Newtonsoft.Json.dll")
+            //    return null;
 
             using (Stream resource = getEmbedded(name)) {
                 if (resource == null)
@@ -137,6 +128,15 @@ namespace ssh_tunnel_agent {
                 resource.Read(read, 0, (int)resource.Length);
                 return Assembly.Load(read);
             }
+        }
+
+        public static void showErrorMessage(string message, bool needAdmin = true) {
+            MessageBox.Show(
+                String.Format(needAdmin ? "{0}{1}{1}{2}" : "{0}", message, Environment.NewLine, @"If this program is located in a system folder (i.e. C:\Program Files\* or C:\), then it needs to be run as an administrator to write files. Or you could just move it to a user (i.e. Documents) folder."),
+                "SSH Tunnel Agent",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error
+            );
         }
     }
 }
