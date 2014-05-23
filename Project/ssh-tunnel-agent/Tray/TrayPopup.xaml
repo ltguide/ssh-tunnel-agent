@@ -9,7 +9,8 @@
             BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" 
             CornerRadius="3" 
             BorderThickness="1"
-            Padding="7">
+            Padding="7"
+            Margin="0,0,5,5">
         <Border.Effect>
             <DropShadowEffect Opacity="0.8"/>
         </Border.Effect>
