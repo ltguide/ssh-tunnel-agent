@@ -14,6 +14,7 @@ namespace ssh_tunnel_agent.Windows {
     public partial class SessionConsole : Window {
         private bool _stayOpen;
 
+
         public SessionConsole(Process process, Session session) {
             InitializeComponent();
 
@@ -22,7 +23,7 @@ namespace ssh_tunnel_agent.Windows {
             else
                 _stayOpen = session.StartShell;
 
-            SessionConsoleViewModel viewModel = new SessionConsoleViewModel(process, session.Name);
+            SessionConsoleViewModel viewModel = new SessionConsoleViewModel(process, session);
             viewModel.StatusChanged += DataContext_StatusChanged;
             viewModel.PasswordRequested += DataContext_PasswordRequested;
 
@@ -65,8 +66,11 @@ namespace ssh_tunnel_agent.Windows {
             bool update = false;
 
             if (e.Key == Key.Escape) {
-                txtInput.Text = "\x1b\x3";
-                update = true;
+                if (((SessionConsoleViewModel)DataContext).shouldSendCancel()) {
+                    txtInput.Text = "\x1b\x3";
+
+                    update = true;
+                }
             }
             else if (e.Key == Key.Enter) {
                 update = true;

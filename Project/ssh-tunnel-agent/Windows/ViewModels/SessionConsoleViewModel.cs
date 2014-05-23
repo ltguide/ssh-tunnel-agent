@@ -1,4 +1,5 @@
 ﻿using ssh_tunnel_agent.Classes;
+using ssh_tunnel_agent.Data;
 using ssh_tunnel_agent.Windows.Classes;
 using System;
 using System.Diagnostics;
@@ -10,6 +11,7 @@ namespace ssh_tunnel_agent.Windows {
         private event EventHandler<StandardDataReceivedEventArgs> StandardDataReceived;
         private string[] _splitby = new string[] { "\r\n" };
         private bool _passwordRequested;
+        private Session _session;
 
         public event EventHandler<ConsoleStatusChangedEventArgs> StatusChanged;
         public event EventHandler PasswordRequested;
@@ -86,9 +88,10 @@ namespace ssh_tunnel_agent.Windows {
             }
         }
 
-        public SessionConsoleViewModel(Process process, string name) {
+        public SessionConsoleViewModel(Process process, Session session) {
+            _session = session;
             Process = process;
-            Title = "Session Console: " + name;
+            Title = "Session Console: " + session.Name;
 
             StandardDataReceived += session_StandardDataReceived;
 
@@ -202,6 +205,14 @@ namespace ssh_tunnel_agent.Windows {
 
             if (PasswordRequested != null)
                 PasswordRequested(this, new EventArgs());
+        }
+
+        public bool shouldSendCancel() {
+            if (Status == ConsoleStatus.ACCESSGRANTED)
+                return true;
+
+            _session.Disconnect();
+            return false;
         }
     }
 }
