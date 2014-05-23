@@ -117,8 +117,10 @@ namespace ssh_tunnel_agent {
         public Assembly CurrentDomain_AssemblyResolve(Object sender, ResolveEventArgs args) {
             string name = args.Name.Substring(0, args.Name.IndexOf(',')) + @".dll";
 
-            //if (name != "Hardcodet.Wpf.TaskbarNotification.dll" && name != "Newtonsoft.Json.dll")
-            //    return null;
+            if (name == "ssh-tunnel-agent.resources.dll")
+                return null;
+
+            Debug.WriteLine("attempt to find assembly: " + name);
 
             using (Stream resource = getEmbedded(name)) {
                 if (resource == null)
