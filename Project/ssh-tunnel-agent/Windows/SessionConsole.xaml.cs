@@ -12,15 +12,19 @@ namespace ssh_tunnel_agent.Windows {
     /// Interaction logic for SessionConsole.xaml
     /// </summary>
     public partial class SessionConsole : Window {
-        private bool stayOpen;
+        private bool _stayOpen;
 
         public SessionConsole(Process process, Session session) {
             InitializeComponent();
 
-            stayOpen = session.StartShell || session.SendCommands;
+            if (session.SendCommands)
+                _stayOpen = session.PersistentConsole;
+            else
+                _stayOpen = session.StartShell;
 
             SessionConsoleViewModel viewModel = new SessionConsoleViewModel(process, session.Name);
-            viewModel.ConsoleStatusChanged += DataContext_ConsoleStatusChanged;
+            viewModel.StatusChanged += DataContext_StatusChanged;
+            viewModel.PasswordRequested += DataContext_PasswordRequested;
 
             DataContext = viewModel;
 
@@ -28,40 +32,48 @@ namespace ssh_tunnel_agent.Windows {
                 App.Current.MainWindow = null;
         }
 
-        public void DataContext_ConsoleStatusChanged(object sender, ConsoleStatusChangedEventArgs e) {
+        public void DataContext_StatusChanged(object sender, ConsoleStatusChangedEventArgs e) {
             InvokeIfRequired(() => {
-                if (e.Status == ConsoleStatus.ACCESSGRANTED && !stayOpen)
-                    Close();
-                else
+                if (e.Status == ConsoleStatus.ACCESSGRANTED && !_stayOpen)
+                    CloseConsole();
+                else if (!IsVisible) {
                     Show();
 
-                if (e.Status == ConsoleStatus.PASSWORD || e.Status == ConsoleStatus.PRIVATEKEY) {
-                    txtStandardInput.Visibility = Visibility.Collapsed;
-                    txtPassword.Visibility = Visibility.Visible;
-                    txtPassword.Focus();
-                }
-                else if (txtPassword.IsVisible) {
-                    txtStandardInput.Visibility = Visibility.Visible;
-                    txtPassword.Visibility = Visibility.Collapsed;
-                    txtStandardInput.Focus();
+                    txtStandardError.ScrollToEnd();
+                    txtStandardOutput.ScrollToEnd();
+                    txtInput.Focus();
                 }
             });
         }
 
-        private void txtStandardInput_KeyUp(object sender, KeyEventArgs e) {
+        private void DataContext_PasswordRequested(object sender, EventArgs e) {
+            InvokeIfRequired(() => {
+                if (txtInput.IsVisible) {
+                    txtInput.Visibility = Visibility.Collapsed;
+                    txtPassword.Visibility = Visibility.Visible;
+                    txtPassword.Focus();
+                }
+                else {
+                    txtInput.Visibility = Visibility.Visible;
+                    txtPassword.Visibility = Visibility.Collapsed;
+                    txtInput.Focus();
+                }
+            });
+        }
+
+        private void txtInput_KeyUp(object sender, KeyEventArgs e) {
             if (e.Key == Key.Enter) {
-                txtStandardInput.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+                txtInput.GetBindingExpression(TextBox.TextProperty).UpdateSource();
                 e.Handled = true;
             }
         }
 
         private void txtPassword_KeyUp(object sender, KeyEventArgs e) {
             if (e.Key == Key.Enter) {
-                txtStandardInput.Text = txtPassword.Password;
+                txtInput.Text = txtPassword.Password;
                 txtPassword.Password = String.Empty;
 
-                txtStandardInput.GetBindingExpression(TextBox.TextProperty).UpdateSource();
-                e.Handled = true;
+                txtInput_KeyUp(sender, e);
             }
         }
 
@@ -73,8 +85,8 @@ namespace ssh_tunnel_agent.Windows {
             textBox.ScrollToEnd();
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e) {
-            txtStandardInput.Focus();
+        private void Window_Closed(object sender, EventArgs e) {
+            CloseConsole();
         }
 
         private void InvokeIfRequired(Action action) {
@@ -84,8 +96,21 @@ namespace ssh_tunnel_agent.Windows {
                 action();
         }
 
-        public void InvokeClose() {
-            InvokeIfRequired(() => Close());
+        public void TryClose() {
+            InvokeIfRequired(() => CloseConsole());
+        }
+
+        private void CloseConsole() {
+            SessionConsoleViewModel viewModel = DataContext as SessionConsoleViewModel;
+            if (viewModel != null) {
+                viewModel.StatusChanged -= DataContext_StatusChanged;
+                viewModel.PasswordRequested -= DataContext_PasswordRequested;
+                viewModel.UnsubscribeStandardDataReceived();
+                DataContext = null;
+            }
+
+            if (IsLoaded)
+                Close();
         }
     }
 }

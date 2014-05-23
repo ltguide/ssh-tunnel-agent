@@ -6,7 +6,7 @@
         Height="500"
         MinWidth="420"
         MinHeight="220"
-        Loaded="Window_Loaded"
+        Closed="Window_Closed"
         WindowStartupLocation="CenterScreen"
         Icon="/ssh-tunnel-agent;component/Assets/network_receive.ico">
     <Grid Margin="4">
@@ -15,11 +15,11 @@
             <RowDefinition Height="5*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBox Grid.Row="0" IsReadOnly="True" Text="{Binding StandardError,NotifyOnTargetUpdated=True}" Margin="0,0,0,7" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TargetUpdated="StandardStream_TargetUpdated" />
+        <TextBox Grid.Row="0" IsReadOnly="True" Name="txtStandardError" Text="{Binding StandardError,NotifyOnTargetUpdated=True}" Margin="0,0,0,7" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TargetUpdated="StandardStream_TargetUpdated" />
 
-        <TextBox Grid.Row="1" IsReadOnly="True" Text="{Binding StandardOutput,NotifyOnTargetUpdated=True}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TargetUpdated="StandardStream_TargetUpdated" FontFamily="Courier New" />
+        <TextBox Grid.Row="1" IsReadOnly="True" Name="txtStandardOutput" Text="{Binding StandardOutput,NotifyOnTargetUpdated=True}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TargetUpdated="StandardStream_TargetUpdated" FontFamily="Courier New" />
 
-        <TextBox Grid.Row="2" Margin="0,4,0,0" Name="txtStandardInput" IsEnabled="{Binding StandardInputEnabled}" Text="{Binding StandardInput, UpdateSourceTrigger=Explicit}" KeyUp="txtStandardInput_KeyUp" VerticalAlignment="Top" />
-        <PasswordBox Grid.Row="2" Margin="0,4,0,0" Name="txtPassword" KeyUp="txtPassword_KeyUp" VerticalAlignment="Top" Visibility="Collapsed" />
+        <TextBox Grid.Row="2" Margin="0,4,0,0" Name="txtInput" IsEnabled="{Binding StandardInputEnabled}" Text="{Binding StandardInput, UpdateSourceTrigger=Explicit}" KeyUp="txtInput_KeyUp" VerticalAlignment="Top" />
+        <PasswordBox Grid.Row="2" Margin="0,4,0,0" Name="txtPassword" IsEnabled="{Binding StandardInputEnabled}" KeyUp="txtPassword_KeyUp" VerticalAlignment="Top" Visibility="Collapsed" />
     </Grid>
 </Window>

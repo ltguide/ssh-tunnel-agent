@@ -3,16 +3,16 @@ using ssh_tunnel_agent.Windows.Classes;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace ssh_tunnel_agent.Windows {
-    public class SessionConsoleViewModel : NotifyPropertyChangedBase, IDisposable {
+    public class SessionConsoleViewModel : NotifyPropertyChangedBase {
         private event EventHandler<StandardDataReceivedEventArgs> StandardDataReceived;
-        private CancellationTokenSource _tokenSource;
         private string[] _splitby = new string[] { "\r\n" };
+        private bool _passwordRequested;
 
-        public event EventHandler<ConsoleStatusChangedEventArgs> ConsoleStatusChanged;
+        public event EventHandler<ConsoleStatusChangedEventArgs> StatusChanged;
+        public event EventHandler PasswordRequested;
 
         public Process Process { get; private set; }
         public string Title { get; private set; }
@@ -42,13 +42,15 @@ namespace ssh_tunnel_agent.Windows {
                 if (Status == ConsoleStatus.STOREHOST || Status == ConsoleStatus.UPDATEHOST)
                     StandardError += value + Environment.NewLine;
                 else {
-                    if (Status == ConsoleStatus.PASSWORD || Status == ConsoleStatus.PRIVATEKEY)
+                    if (_passwordRequested) {
                         StandardOutput += "***";
-                    else if (Status != ConsoleStatus.ACCESSGRANTED)
+                        OnPasswordRequested(); // flip input boxes
+                    }
+                    else if (Status != ConsoleStatus.ACCESSGRANTED) // server will echo now
                         StandardOutput += value;
 
                     if (Status == ConsoleStatus.LOGINAS)
-                        StandardOutput += Environment.NewLine;
+                        StandardOutput += Environment.NewLine; // whyyyyy
                 }
 
                 Process.StandardInput.Write(value + "\n");
@@ -79,8 +81,8 @@ namespace ssh_tunnel_agent.Windows {
                 _status = value;
                 NotifyPropertyChanged();
 
-                if (ConsoleStatusChanged != null)
-                    ConsoleStatusChanged(this, new ConsoleStatusChangedEventArgs(_status));
+                if (StatusChanged != null)
+                    StatusChanged(this, new ConsoleStatusChangedEventArgs(_status));
             }
         }
 
@@ -90,39 +92,54 @@ namespace ssh_tunnel_agent.Windows {
 
             StandardDataReceived += session_StandardDataReceived;
 
-            _tokenSource = new CancellationTokenSource();
-
-            Task.Factory.StartNew(() => monitorStream(Process.StandardError, StandardStreamType.ERROR, _tokenSource.Token), _tokenSource.Token);
-            Task.Factory.StartNew(() => monitorStream(Process.StandardOutput, StandardStreamType.OUTPUT, _tokenSource.Token), _tokenSource.Token);
+            Task.Factory.StartNew(() => monitorStream(Process.StandardError, StandardStreamType.ERROR));
+            Task.Factory.StartNew(() => monitorStream(Process.StandardOutput, StandardStreamType.OUTPUT));
         }
 
-        private async void monitorStream(StreamReader streamReader, StandardStreamType type, CancellationToken ct) {
-            char[] buffer = new char[1024];
+        private async void monitorStream(StreamReader streamReader, StandardStreamType type) {
+            try {
+                char[] buffer = new char[1024];
 
-            while (!streamReader.EndOfStream) {
-                if (ct.IsCancellationRequested)
-                    return;
-
-                int read = await streamReader.ReadAsync(buffer, 0, 1024);
-                if (read > 0)
-                    StandardDataReceived(streamReader, new StandardDataReceivedEventArgs(type, new string(buffer, 0, read)));
+                using (streamReader)
+                    while (!streamReader.EndOfStream) {
+                        int read = await streamReader.ReadAsync(buffer, 0, 1024);
+                        if (read > 0)
+                            OnStandardDataReceived(streamReader, new StandardDataReceivedEventArgs(type, new string(buffer, 0, read)));
+                    }
             }
+            catch (ObjectDisposedException) { } // in case the stream gets closed elsewhere
+            catch (NullReferenceException) { }
 
-            streamReader.Close();
             StandardInputEnabled = false;
+
+            Debug.WriteLine("end standard " + type + " stream monitor");
+        }
+
+        private void OnStandardDataReceived(object sender, StandardDataReceivedEventArgs e) {
+            if (StandardDataReceived != null)
+                StandardDataReceived(sender, e);
+        }
+
+        public void UnsubscribeStandardDataReceived() {
+            StandardDataReceived -= session_StandardDataReceived;
         }
 
         private void session_StandardDataReceived(object sender, StandardDataReceivedEventArgs e) {
             if (e.Type == StandardStreamType.OUTPUT) {
-                if (e.Data == "login as: ")
-                    Status = ConsoleStatus.LOGINAS;
-                else if (e.Data.EndsWith("'s password: "))
-                    Status = ConsoleStatus.PASSWORD;
-                else if (e.Data.StartsWith("Passphrase for key "))
-                    Status = ConsoleStatus.PRIVATEKEY;
+                if (Status != ConsoleStatus.ACCESSGRANTED) {
+                    if (e.Data == "login as: ")
+                        Status = ConsoleStatus.LOGINAS;
+                    else if (e.Data.EndsWith("'s password: ")) {
+                        Status = ConsoleStatus.PASSWORD;
+                        OnPasswordRequested();
+                    }
+                    else if (e.Data.StartsWith("Passphrase for key ")) {
+                        Status = ConsoleStatus.PRIVATEKEY;
+                        OnPasswordRequested();
+                    }
 
-                if (Status != ConsoleStatus.ACCESSGRANTED)
                     StandardOutput += e.Data;
+                }
                 else {
                     char[] data = new char[e.Data.Length];
                     int read = 0;
@@ -156,7 +173,11 @@ namespace ssh_tunnel_agent.Windows {
                             data[read++] = c;
                     }
 
-                    StandardOutput += new string(data, 0, read);
+                    string output = new string(data, 0, read);
+                    if (output.EndsWith("Password: "))
+                        OnPasswordRequested();
+
+                    StandardOutput += output;
                 }
             }
 
@@ -176,15 +197,11 @@ namespace ssh_tunnel_agent.Windows {
             }
         }
 
-        public void Dispose() {
-            Dispose(true);
-        }
+        private void OnPasswordRequested() {
+            _passwordRequested = !_passwordRequested;
 
-        protected virtual void Dispose(bool disposing) {
-            if (disposing) {
-                if (_tokenSource != null)
-                    _tokenSource.Dispose();
-            }
+            if (PasswordRequested != null)
+                PasswordRequested(this, new EventArgs());
         }
     }
 }

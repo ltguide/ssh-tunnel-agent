@@ -76,6 +76,7 @@ namespace ssh_tunnel_agent.Data {
             }
         }
         public bool RemoteCommandSubsystem { get; set; }    // -s
+        public bool PersistentConsole { get; set; }
 
         private ObservableCollection<Tunnel> _tunnels = new ObservableCollection<Tunnel>();
         public ObservableCollection<Tunnel> Tunnels {
@@ -109,6 +110,7 @@ namespace ssh_tunnel_agent.Data {
             RemoteCommand = String.Empty;
             RemoteCommandFile = String.Empty;
             RemoteCommandSubsystem = false;
+            PersistentConsole = true;
         }
 
         private string getArguments() {
@@ -202,11 +204,11 @@ namespace ssh_tunnel_agent.Data {
             _process.Exited += process_Exited;
 
             if (_sessionConsole != null)
-                _sessionConsole.InvokeClose();
+                _sessionConsole.TryClose();
 
             _sessionConsole = new SessionConsole(_process, this);
 
-            if (SendCommands)
+            if (SendCommands && PersistentConsole)
                 _sessionConsole.Show();
 
             Status = SessionStatus.CONNECTED;
@@ -224,7 +226,7 @@ namespace ssh_tunnel_agent.Data {
             _process.Close();
 
             if (_sessionConsole != null)
-                _sessionConsole.InvokeClose();
+                _sessionConsole.TryClose();
 
             Status = SessionStatus.DISCONNECTED;
         }
@@ -233,12 +235,11 @@ namespace ssh_tunnel_agent.Data {
             if (!_processExit) {
                 Debug.WriteLine("exit: \"" + Name + "\"; " + _process.ExitCode);
 
-                if (_process.ExitCode == 0) {
-                    Status = SessionStatus.DISCONNECTED;
+                if (_sessionConsole != null && (!SendCommands || !PersistentConsole))
+                    _sessionConsole.TryClose();
 
-                    if (_sessionConsole != null)
-                        _sessionConsole.InvokeClose();
-                }
+                if (_process.ExitCode == 0)
+                    Status = SessionStatus.DISCONNECTED;
                 else {
                     Status = SessionStatus.ERROR;
 
