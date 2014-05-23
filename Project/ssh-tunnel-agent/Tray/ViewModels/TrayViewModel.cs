@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+﻿using Microsoft.Win32.TaskScheduler;
 using Newtonsoft.Json;
 using ssh_tunnel_agent.Classes;
 using ssh_tunnel_agent.Config;
@@ -6,6 +6,7 @@ using ssh_tunnel_agent.Data;
 using ssh_tunnel_agent.Windows;
 using System;
 using System.Collections.ObjectModel;
+using System.Security.Principal;
 using System.Windows.Data;
 using System.Windows.Input;
 
@@ -18,13 +19,17 @@ namespace ssh_tunnel_agent.Tray {
                     _autoStartApplication = false;
 
                     try {
-                        RegistryKey run = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
-                        object value = run.GetValue("ssh-tunnel-agent");
-                        if (value != null) {
-                            if (value.ToString() == '"' + Environment.GetCommandLineArgs()[0] + '"')
-                                _autoStartApplication = true;
-                            else
-                                run.DeleteValue("ssh-tunnel-agent");
+                        string taskName = "ssh-tunnel-agent_" + WindowsIdentity.GetCurrent().Name.Replace(@"\", "-");
+                        using (TaskService ts = new TaskService()) {
+                            Task task = ts.FindTask(taskName);
+                            if (task != null) {
+                                foreach (Microsoft.Win32.TaskScheduler.Action action in task.Definition.Actions)
+                                    if (action.ActionType == TaskActionType.Execute && ((ExecAction)action).Path == '"' + Environment.GetCommandLineArgs()[0] + '"')
+                                        _autoStartApplication = true;
+
+                                if (_autoStartApplication == false)
+                                    ts.RootFolder.DeleteTask(taskName);
+                            }
                         }
                     }
                     catch (Exception) { }
@@ -55,12 +60,37 @@ namespace ssh_tunnel_agent.Tray {
                     _autoStartApplicationCommand = new RelayCommand(
                         () => {
                             try {
-                                RegistryKey run = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
-                                if (AutoStartApplication == false) {
-                                    run.SetValue("ssh-tunnel-agent", '"' + Environment.GetCommandLineArgs()[0] + '"', RegistryValueKind.String);
+                                string userName = WindowsIdentity.GetCurrent().Name;
+                                string taskName = "ssh-tunnel-agent_" + userName.Replace(@"\", "-");
+                                using (TaskService ts = new TaskService()) {
+                                    if (AutoStartApplication == false) {
+                                        bool v2 = ts.HighestSupportedVersion >= new Version(1, 2);
+                                        TaskDefinition td = ts.NewTask();
+
+                                        td.RegistrationInfo.Author = "SSH Tunnel Agent";
+                                        td.RegistrationInfo.Description = "Start SSH Tunnel Agent on logon";
+
+                                        td.Principal.UserId = userName;
+                                        if (v2)
+                                            td.Principal.LogonType = TaskLogonType.InteractiveToken;
+
+                                        td.Settings.DisallowStartIfOnBatteries = false;
+                                        td.Settings.ExecutionTimeLimit = TimeSpan.Zero;
+
+                                        LogonTrigger trigger = new LogonTrigger();
+                                        if (v2) {
+                                            trigger.Delay = TimeSpan.FromSeconds(30);
+                                            trigger.UserId = userName;
+                                        }
+                                        td.Triggers.Add(trigger);
+
+                                        td.Actions.Add(new ExecAction('"' + Environment.GetCommandLineArgs()[0] + '"', null, null));
+
+                                        ts.RootFolder.RegisterTaskDefinition(taskName, td);
+                                    }
+                                    else
+                                        ts.RootFolder.DeleteTask(taskName);
                                 }
-                                else
-                                    run.DeleteValue("ssh-tunnel-agent");
 
                                 AutoStartApplication = !AutoStartApplication;
                             }
@@ -171,7 +201,10 @@ namespace ssh_tunnel_agent.Tray {
 
                 return _connectedSessions.View as CollectionView;
             }
-            set { _connectedSessions.View.Refresh(); }
+            set {
+                if (_connectedSessions != null)
+                    _connectedSessions.View.Refresh();
+            }
         }
 
         private ObservableCollection<Session> _sessions;
