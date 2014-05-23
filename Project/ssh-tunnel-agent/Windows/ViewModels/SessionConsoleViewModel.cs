@@ -43,7 +43,7 @@ namespace ssh_tunnel_agent.Windows {
                     StandardError += value + Environment.NewLine;
                 else {
                     if (_passwordRequested) {
-                        StandardOutput += "***";
+                        if (value != String.Empty && value != "\x1b\x3") StandardOutput += "***";
                         OnPasswordRequested(); // flip input boxes
                     }
                     else if (Status != ConsoleStatus.ACCESSGRANTED) // server will echo now

@@ -62,14 +62,28 @@ namespace ssh_tunnel_agent.Windows {
         }
 
         private void txtInput_KeyUp(object sender, KeyEventArgs e) {
-            if (e.Key == Key.Enter) {
+            bool update = false;
+
+            if (e.Key == Key.Escape) {
+                txtInput.Text = "\x1b\x3";
+                update = true;
+            }
+            else if (e.Key == Key.Enter) {
+                update = true;
+            }
+
+            if (update) {
                 txtInput.GetBindingExpression(TextBox.TextProperty).UpdateSource();
                 e.Handled = true;
             }
         }
 
         private void txtPassword_KeyUp(object sender, KeyEventArgs e) {
-            if (e.Key == Key.Enter) {
+            if (e.Key == Key.Escape) {
+                txtPassword.Password = String.Empty;
+                txtInput_KeyUp(sender, e);
+            }
+            else if (e.Key == Key.Enter) {
                 txtInput.Text = txtPassword.Password;
                 txtPassword.Password = String.Empty;
 
