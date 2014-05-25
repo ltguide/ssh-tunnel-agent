@@ -129,7 +129,7 @@ namespace ssh_tunnel_agent.Tray {
                             if (App.Current.MainWindow != null)
                                 return false;
 
-                            if (session != null && session.Status == SessionStatus.CONNECTED)
+                            if (session != null && session.IsConnectionOpen)
                                 return false;
 
                             return true;
@@ -195,7 +195,7 @@ namespace ssh_tunnel_agent.Tray {
                     _connectedSessions.Source = Sessions;
                     _connectedSessions.Filter += (sender, e) => {
                         Session session = e.Item as Session;
-                        e.Accepted = session.Status == SessionStatus.CONNECTED && !session.SendCommands;
+                        e.Accepted = session.IsConnectionOpen && !session.SendCommands;
                     };
                 }
 

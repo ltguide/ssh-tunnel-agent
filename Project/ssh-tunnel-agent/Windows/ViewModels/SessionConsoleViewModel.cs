@@ -194,8 +194,10 @@ namespace ssh_tunnel_agent.Windows {
                         Status = ConsoleStatus.STOREHOST;
                     else if (Array.IndexOf(lines, "Update cached key? (y/n, Return cancels connection) ") >= 0)
                         Status = ConsoleStatus.UPDATEHOST;
-                    else if (Array.IndexOf(lines, "Access granted") >= 0)
+                    else if (Array.IndexOf(lines, "Access granted") >= 0) {
                         Status = ConsoleStatus.ACCESSGRANTED;
+                        _session.Status = SessionStatus.CONNECTED;
+                    }
                 }
 
                 StandardError += e.Data;

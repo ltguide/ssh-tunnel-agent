@@ -84,6 +84,12 @@ namespace ssh_tunnel_agent.Data {
             get { return _tunnels; }
         }
 
+        public bool IsConnectionOpen {
+            get {
+                return Status == SessionStatus.CONNECTED || Status == SessionStatus.CONNECTING;
+            }
+        }
+
         public Session(TrayViewModel viewModel)
             : this() {
             SetViewModel(viewModel);
@@ -172,15 +178,17 @@ namespace ssh_tunnel_agent.Data {
         }
 
         public void ToggleConnection() {
-            if (Status == SessionStatus.CONNECTED)
+            if (IsConnectionOpen)
                 Disconnect();
             else
                 Connect();
         }
 
         public void Connect() {
-            if (Status == SessionStatus.CONNECTED)
+            if (IsConnectionOpen)
                 return;
+
+            Status = SessionStatus.CONNECTING;
 
             Debug.WriteLine("connect: \"" + Name + "\"; " + App.Plink + " " + getArguments());
 
@@ -210,12 +218,10 @@ namespace ssh_tunnel_agent.Data {
 
             if (SendCommands && PersistentConsole)
                 _sessionConsole.Show();
-
-            Status = SessionStatus.CONNECTED;
         }
 
         public void Disconnect() {
-            if (Status != SessionStatus.CONNECTED)
+            if (!IsConnectionOpen)
                 return;
 
             Debug.WriteLine("disconnect: \"" + Name + "\"");
