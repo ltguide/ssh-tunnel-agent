@@ -196,7 +196,7 @@ namespace ssh_tunnel_agent.Windows {
                         Status = ConsoleStatus.UPDATEHOST;
                     else if (Array.IndexOf(lines, "Access granted") >= 0) {
                         Status = ConsoleStatus.ACCESSGRANTED;
-                        _session.Status = SessionStatus.CONNECTED;
+                        _session.Connected();
                     }
                 }
 

@@ -26,6 +26,16 @@ namespace ssh_tunnel_agent.Data {
             }
         }
 
+        private int _connectionAttempts;
+        [JsonIgnore]
+        public int ConnectionAttempts {
+            get { return _connectionAttempts; }
+            set {
+                _connectionAttempts = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         private string _name;
         public string Name {
             get { return _name; }
@@ -188,6 +198,7 @@ namespace ssh_tunnel_agent.Data {
             if (IsConnectionOpen)
                 return;
 
+            ConnectionAttempts++;
             Status = SessionStatus.CONNECTING;
 
             Debug.WriteLine("connect: \"" + Name + "\"; " + App.Plink + " " + getArguments());
@@ -226,6 +237,9 @@ namespace ssh_tunnel_agent.Data {
 
             Debug.WriteLine("disconnect: \"" + Name + "\"");
 
+            if (_reconnectTimer != null)
+                _reconnectTimer.Change(Timeout.Infinite, Timeout.Infinite);
+
             _processExit = true;
             _process.Kill();
             _process.WaitForExit();
@@ -234,6 +248,7 @@ namespace ssh_tunnel_agent.Data {
             if (_sessionConsole != null)
                 _sessionConsole.TryClose();
 
+            ConnectionAttempts = 0;
             Status = SessionStatus.DISCONNECTED;
         }
 
@@ -259,6 +274,11 @@ namespace ssh_tunnel_agent.Data {
 
                 _process.Close();
             }
+        }
+
+        public void Connected() {
+            ConnectionAttempts = 0;
+            Status = SessionStatus.CONNECTED;
         }
 
         public override string ToString() {

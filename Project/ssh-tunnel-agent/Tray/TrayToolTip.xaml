@@ -62,7 +62,12 @@
                                         </Style.Triggers>
                                     </Style>
                                 </ListBox.Style>
-                                <ListBoxItem Content="Connecting..." />
+                                <ListBoxItem>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Connection Attempt: " />
+                                        <TextBlock Text="{Binding ConnectionAttempts}" />
+                                    </StackPanel>
+                                </ListBoxItem>
                             </ListBox>
                         </StackPanel>
                     </DataTemplate>
