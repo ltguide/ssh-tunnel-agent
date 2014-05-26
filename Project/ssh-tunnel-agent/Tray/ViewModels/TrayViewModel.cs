@@ -6,6 +6,7 @@ using ssh_tunnel_agent.Data;
 using ssh_tunnel_agent.Windows;
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Security.Principal;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -24,7 +25,7 @@ namespace ssh_tunnel_agent.Tray {
                             Task task = ts.FindTask(taskName);
                             if (task != null) {
                                 foreach (Microsoft.Win32.TaskScheduler.Action action in task.Definition.Actions)
-                                    if (action.ActionType == TaskActionType.Execute && ((ExecAction)action).Path == '"' + Environment.GetCommandLineArgs()[0] + '"')
+                                    if (action.ActionType == TaskActionType.Execute && ((ExecAction)action).Path == '"' + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppDomain.CurrentDomain.FriendlyName) + '"')
                                         _autoStartApplication = true;
 
                                 if (_autoStartApplication == false)
@@ -84,7 +85,7 @@ namespace ssh_tunnel_agent.Tray {
                                         }
                                         td.Triggers.Add(trigger);
 
-                                        td.Actions.Add(new ExecAction('"' + Environment.GetCommandLineArgs()[0] + '"', null, null));
+                                        td.Actions.Add(new ExecAction('"' + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppDomain.CurrentDomain.FriendlyName) + '"', null, null));
 
                                         ts.RootFolder.RegisterTaskDefinition(taskName, td);
                                     }
