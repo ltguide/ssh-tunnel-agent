@@ -94,6 +94,7 @@ namespace ssh_tunnel_agent.Data {
             get { return _tunnels; }
         }
 
+        [JsonIgnore]
         public bool IsConnectionOpen {
             get {
                 return Status == SessionStatus.CONNECTED || Status == SessionStatus.CONNECTING;
@@ -289,6 +290,13 @@ namespace ssh_tunnel_agent.Data {
                 sb.AppendLine(tunnel.ToString());
 
             return sb.ToString();
+        }
+
+        public void Kill() {
+            if (!IsConnectionOpen || _process == null || _process.HasExited)
+                return;
+
+            _process.Kill();
         }
     }
 }

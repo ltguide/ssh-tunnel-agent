@@ -6,6 +6,7 @@ using ssh_tunnel_agent.Data;
 using ssh_tunnel_agent.Windows;
 using System;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.IO;
 using System.Security.Principal;
 using System.Windows.Data;
@@ -212,7 +213,7 @@ namespace ssh_tunnel_agent.Tray {
         public ObservableCollection<Session> Sessions {
             get {
                 if (_sessions == null) {
-                    string value = new Settings().GetCData("Sessions");
+                    string value = new Settings(ConfigurationUserLevel.PerUserRoaming).GetCData("Sessions");
                     if (value == "")
                         _sessions = new ObservableCollection<Session>();
                     else {
@@ -235,14 +236,28 @@ namespace ssh_tunnel_agent.Tray {
         }
 
         internal void SaveSessions() {
-            Settings settings = new Settings();
-            settings.SetCData("Sessions", JsonConvert.SerializeObject(Sessions, Formatting.Indented));
-            settings.Save();
+            string sessions = JsonConvert.SerializeObject(Sessions, Formatting.Indented);
+
+            if (_saveSessions(ConfigurationUserLevel.None, sessions) == null)
+                return;
+
+            string message = _saveSessions(ConfigurationUserLevel.PerUserRoaming, sessions);
+            if (message != null)
+                App.showErrorMessage("Unable to save sessions!" + Environment.NewLine + Environment.NewLine + message);
         }
 
-        internal void DisconnectSessions() {
+        private string _saveSessions(ConfigurationUserLevel userLevel, string sessions) {
+            Settings settings = new Settings(userLevel);
+            settings.SetCData("Sessions", sessions);
+            return settings.Save();
+        }
+
+        public void DisconnectSessions(bool kill) {
             foreach (Session session in Sessions)
-                session.Disconnect();
+                if (kill)
+                    session.Kill();
+                else
+                    session.Disconnect();
         }
     }
 }

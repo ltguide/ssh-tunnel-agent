@@ -1,4 +1,5 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
+using Microsoft.Win32;
 using ssh_tunnel_agent.Tray;
 using System;
 using System.Diagnostics;
@@ -31,12 +32,14 @@ namespace ssh_tunnel_agent {
 
         private void Application_Exit(object sender, ExitEventArgs e) {
             try {
-                closeViewModel();
+                closeViewModel(false);
             }
             catch (Exception) { }
+
+            SystemEvents.PowerModeChanged -= SystemEvents_PowerModeChanged;
         }
 
-        private void closeViewModel() {
+        private void closeViewModel(bool kill) {
             if (TrayIcon == null)
                 return;
 
@@ -44,7 +47,7 @@ namespace ssh_tunnel_agent {
             if (viewModel == null)
                 return;
 
-            viewModel.DisconnectSessions();
+            viewModel.DisconnectSessions(kill);
         }
 
         private void Application_Startup(object sender, StartupEventArgs e) {
@@ -62,7 +65,7 @@ namespace ssh_tunnel_agent {
                 FindResource("TrayIcon");
             }
             catch (Exception) {
-                App.showErrorMessage("Unable to load a required embedded extension.", false);
+                App.showErrorMessage("Unable to load a required embedded extension.");
                 App.Current.Shutdown();
                 return;
             }
@@ -72,20 +75,32 @@ namespace ssh_tunnel_agent {
                 App.showErrorMessage("Failed to find up-to-date plink.exe.");
                 App.Current.Shutdown();
             }
+
+            SystemEvents.PowerModeChanged += SystemEvents_PowerModeChanged;
+        }
+
+        void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e) {
+            if (e.Mode == PowerModes.Resume)
+                closeViewModel(true);
         }
 
         public static string FindFile(string file, Version version) {
             string myFile = "ssh-tunnel-agent-" + file;
-            if (matchFileVersion(file, version)) {
-                try { File.Delete(myFile); }
+            if (matchFileVersion(file, version)) { // utilize user's existing copy if same version or newer than ours
+                try { File.Delete(myFile); } // attempt cleanup
                 catch (Exception) { }
 
                 return file;
             }
-            else if (upgradeFile(file, myFile, version))
+
+            if (upgradeFile(file, myFile, version)) // try to write our copy to current directory
                 return myFile;
-            else
-                return null;
+
+            myFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ssh-tunnel-agent", file);
+            if (upgradeFile(file, myFile, version)) // last resort, write to user's roaming appdata
+                return myFile;
+
+            return null;
         }
 
         private static bool upgradeFile(string file, string myFile, Version version) {
@@ -95,6 +110,10 @@ namespace ssh_tunnel_agent {
             using (Stream resource = getEmbedded(file)) {
                 if (resource != null)
                     try {
+                        string path = Path.GetDirectoryName(myFile);
+                        if (path != String.Empty)
+                            Directory.CreateDirectory(path);
+
                         using (FileStream fileStream = new FileStream(myFile, FileMode.Create, FileAccess.Write)) {
                             resource.CopyTo(fileStream);
                             return true;
@@ -143,13 +162,8 @@ namespace ssh_tunnel_agent {
             }
         }
 
-        public static void showErrorMessage(string message, bool needAdmin = true) {
-            MessageBox.Show(
-                String.Format(needAdmin ? "{0}{1}{1}{2}" : "{0}", message, Environment.NewLine, @"If this program is located in a system folder (i.e. C:\Program Files\* or C:\), then it needs to be run as an administrator to write files. Or you could just move it to a user (i.e. Documents) folder."),
-                "SSH Tunnel Agent",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error
-            );
+        public static void showErrorMessage(string message) {
+            MessageBox.Show(message, "SSH Tunnel Agent", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }
