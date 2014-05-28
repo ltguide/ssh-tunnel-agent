@@ -980,3 +980,11 @@ footer .owner p a {
 .highlight .vg { color: #008080 } /* Name.Variable.Global */
 .highlight .vi { color: #008080 } /* Name.Variable.Instance */
 .highlight .il { color: #009999 } /* Literal.Number.Integer.Long */
+
+#nav {
+	background-color: #3b3b3b;
+	color: #d6d6d6;
+	padding: 10px 20px;
+	font-family: 'Monaco', 'Lucida Console', monospace;
+	box-shadow: inset 0 0 15px #000;
+}

@@ -15,108 +15,112 @@
   <meta name="description" content="">
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
-
 </head>
 
 <body>
-
   <div class="wrapper">
     <header>
       <h1 class="title">SSH Tunnel Agent</h1>
     </header>
     <div id="container">
-      <p class="tagline">tagline goes here</p>
+      <p class="tagline">Maintain SSH tunnels quietly and easily</p>
       <div id="main" role="main">
         <div class="download-bar">
-        <div class="inner">
-          <a href="https://github.com/ltguide/ssh-tunnel-agent/releases/download/v1.0.2/ssh-tunnel-agent.exe" class="download-button exe"><span>Download</span></a>
-          <a href="https://github.com/ltguide/ssh-tunnel-agent" class="code">View SSH Tunnel Agent on GitHub</a>
+			<div class="inner">
+			  <a href="https://github.com/ltguide/ssh-tunnel-agent/releases/download/v1.3/ssh-tunnel-agent.exe" class="download-button exe"><span>Download</span></a>
+			  <a href="https://github.com/ltguide/ssh-tunnel-agent" class="code">View SSH Tunnel Agent on GitHub</a>
+			</div>
+			<span class="blc"></span><span class="trc"></span>
         </div>
-        <span class="blc"></span><span class="trc"></span>
-        </div>
-        <article class="markdown-body">
+		
+		<article class="markdown-body">
+		
+			<div id="nav">
+				<h3>Contents</h3>
+				<ul>
+					<li><a href="#introduction">Introduction</a></li>
+					<li><a href="#requirements">Requirements</a></li>
+					<li><a href="#visual-instructions">Visual Instructions</a></li>
+					<li><a href="#things-to-consider">Things to Consider</a></li>
+				</ul>
+			</div>
+	
+			<h3><a name="introduction" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Introduction</h3>
 
-<h3><a name="introduction" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Introduction</h3>
+			<p>SSH Tunnel Agent is a Windows program that maintains <strong>S</strong>ecure <strong>Sh</strong>ell  tunnels quietly and easily. All features are accessed through its icon in the system tray (bottom-right, by the clock).</p>
 
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ut turpis egestas risus gravida tincidunt vitae sed purus. Vivamus ut nisi porttitor, interdum purus nec, egestas ipsum. Morbi a interdum erat. Phasellus blandit ut enim mollis fermentum. Etiam vestibulum, purus.</p>
+			<p>If you are not familiar with tunnels, read this Wikipedia article on <a href="http://en.wikipedia.org/wiki/Port_forwarding">Port Forwarding</a> or just <a href="https://www.google.com/search?q=ssh+tunnel">Google it</a>.</p>
+			
+			<p>Behind the scenes the program uses Plink which is a command-line version of the popular SSH client <a href="http://en.wikipedia.org/wiki/PuTTY">PuTTY</a> written and maintained primarily by <a href="http://www.chiark.greenend.org.uk/~sgtatham/">Simon Tatham</a>.</p>
 
-<!--<pre><code>x
-x
-x
-</code></pre>-->
+			<h3><a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h3>
 
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tincidunt fringilla vestibulum. Donec id rutrum.</p>
+			<p>This program requires at least the <a href="http://www.microsoft.com/net/downloads">.NET Framework 4.5</a> which is included with Windows 8. Windows 7 SP1 and Windows Vista SP2 are compatible with the framework, but it must be installed separately or obtained through Windows Update.</p>
 
-<h3><a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h3>
+			<p>You must use this program in <strong>a country that does not outlaw the use of encryption</strong>. Otherwise, use of this program may be illegal.</p>
 
-<p>This program requires at least the <a href="http://www.microsoft.com/net/downloads">.NET Framework 4.5</a> which is included with Windows 8. Windows 7 SP1 and Windows Vista SP2 are compatible with the framework, but it must be installed separately or obtained through Windows Update.</p>
+			<h3><a name="visual-instructions" class="anchor" href="#visual-instructions"><span class="octicon octicon-link"></span></a>Visual Instructions</h3>
 
-<p>You must use this program in <strong>a country that does not outlaw the use of encryption</strong>. Otherwise, use of this program may be illegal.</p>
+			<p>
+				Hover over the Tray Icon for a Tooltip containing the currently connected sessions.
+				<br />
+				<img src="screenshots/tray_tooltip.png" alt="" />
+			</p>
+			<hr />
+			<p>
+				Right-click the Tray Icon to toggle application-wide settings or to Exit. The setting "Start when you logon" creates a scheduled task that runs the program about 30 seconds after you logon.
+				<br />
+				<img src="screenshots/tray_contextmenu.png" alt="" />
+			</p>
+			<hr />
+			<p>
+				Left/Double-click the Tray Icon for the session control popup. It displays all the sesions and whether they are connected, disconnected, or had an error. The "Add session" link will open the "Configure Session" window. Double-clicking on a session will connect or disconnect that session.
+				<br />
+				<img src="screenshots/tray_popup.png" alt="" />
+			</p>
+			<hr />
+			<p>
+				In the session control popup, right-click on a session to toggle its connection state or edit its configuration. You cannot edit a session that is currently connected.
+				<br />
+				<img src="screenshots/popup_contextmenu.png" alt="" />
+			</p>
+			<hr />
+			<p>
+				In the session control popup, click "Add session" or right-click a session and choose Configure to open the "Configure Session" window. You can click the "Remove session" link in the bottom-left to remove a session.
+				<br />
+				<img src="screenshots/add_session-tunnel.png" alt="" />
+			</p>
+			<hr />
+			<p>
+				In the "Configure Session" window, check the "Send Data instead of opening Tunnel" checkbox to hide the tunnel options and show the remote command options. Sessions with remote commands will change status to Disconnected if they complete successfully and Error if they fail.
+				<br />
+				<img src="screenshots/add_session-data.png" alt="" />
+			</p>
+			<hr />
+			<p>
+				The "Session Console" windows will always be displayed if any input is required after a session is started, if the "Start a Shell" option is checked, or if a session is sending remote commands and the "Show console to view results" option is checked. Closing the "Session Console" does not disconnect the session. The window cannot be reopened without reconnecting.
+				<br />
+				<img src="screenshots/session_console.png" alt="" />
+			</p>
+			
+			<h3><a name="things-to-consider" class="anchor" href="#things-to-consider"><span class="octicon octicon-link"></span></a>Things to Consider</h3>
 
-<h3><a name="visual-instructions" class="anchor" href="#visual-instructions"><span class="octicon octicon-link"></span></a>Visual Instructions</h3>
-
-<p>
-	Hover over the Tray Icon for a Tooltip containing the currently connected sessions.
-	<br />
-	<img src="screenshots/tray_tooltip.png" alt="" />
-</p>
-<hr />
-<p>
-	Right-click the Tray Icon to toggle the only application-wide setting or to Exit.
-	<br />
-	<img src="screenshots/tray_contextmenu.png" alt="" />
-</p>
-<hr />
-<p>
-	Left/Double-click the Tray Icon for the session control popup. It displays all the sesions and whether they are connected, disconnected, or had an error. The "Add session" link will open the "Configure Session" window. Double-clicking on a session will connect or disconnect that session.
-	<br />
-	<img src="screenshots/tray_popup.png" alt="" />
-</p>
-<hr />
-<p>
-	In the session control popup, right-click on a session to toggle its connection state or edit its configuration. You cannot edit a session that is currently connected.
-	<br />
-	<img src="screenshots/popup_contextmenu.png" alt="" />
-</p>
-<hr />
-<p>
-	In the session control popup, click "Add session" or right-click a session and choose Configure to open the "Configure Session" window. You can click the "Remove session" link in the bottom-left to remove a session.
-	<br />
-	<img src="screenshots/add_session-tunnel.png" alt="" />
-</p>
-<hr />
-<p>
-	In the "Configure Session" window, check the "Send Data instead of opening Tunnel" checkbox to hide the tunnel options and show the remote command options. Sessions with remote commands will change status to Disconnected if they complete successfully and Error if they fail.
-	<br />
-	<img src="screenshots/add_session-data.png" alt="" />
-</p>
-<hr />
-<p>
-	The "Session Console" windows will always be displayed if the "Start a Shell" option is checked, if any input is required after a session is started, or if a session is sending remote commands. Closing the "Session Console" does not disconnect the session. The window cannot be reopened without reconnecting.
-	<br />
-	<img src="screenshots/session_console.png" alt="" />
-</p>
-
+			<p>If a session doesn't seem to be working correctly, then enable the "Start a shell" or "Show console to view results" options (then connect again) to open the Session Console to view the connection details.</p>
+			
+			<p>If the program is located in a system folder (C:\, C:\Program Files\*, etc), then it will not be able to write to that location (unless it is run as an administrator). Instead, it will write to <strong>ssh-tunnel-agent</strong> in the current user's roaming profile. You can easily access this folder by typing <strong>%APPDATA%</strong> into the start menu/screen and pressing enter. If the .config file exists in this location, then it will override the .config located with the program.</p>
+			
+			<p>If the "Start when you logon" setting is enabled and you move the program to another location, then the scheduled task will be automatically deleted the next time the program is started. You will have to manually re-enable "Start when you logon" to create the task again.</p>
         </article>
       </div>
     </div>
     <footer>
       <div class="owner">
-      <p><a href="https://github.com/ltguide" class="avatar"><img src="https://avatars2.githubusercontent.com/u/709734?s=60" width="48" height="48"/></a> <a href="https://github.com/ltguide">ltguide</a> maintains <a href="https://github.com/ltguide/ssh-tunnel-agent">SSH Tunnel Agent</a></p>
-
-
+		<p><a href="https://github.com/ltguide" class="avatar"><img src="https://avatars2.githubusercontent.com/u/709734?s=60" width="48" height="48"/></a> <a href="https://github.com/ltguide">ltguide</a> maintains <a href="https://github.com/ltguide/ssh-tunnel-agent">SSH Tunnel Agent</a></p>
       </div>
       <div class="creds">
         <small>Theme by <a href="https://twitter.com/jonrohan/">Jon Rohan</a></small>
       </div>
     </footer>
-  </div>
-  <!--<div class="current-section">
-    <a href="#top">Scroll to top</a>
-    <a href="https://github.com/ltguide/ssh-tunnel-agent/tarball/master" class="tar">tar</a><a href="https://github.com/ltguide/ssh-tunnel-agent/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
-    <p class="name"></p>
-  </div>-->
-
-  
+  </div>  
 </body>
 </html>
