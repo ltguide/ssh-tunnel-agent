@@ -228,7 +228,7 @@
                         </StackPanel>
 
                         <CheckBox Content="Remote Command is SSH Subsystem" IsChecked="{Binding Session.RemoteCommandSubsystem}" Margin="0,4,0,0" />
-                        <CheckBox Content="Show console to view results" IsChecked="{Binding Session.PersistentConsole}" />
+                        <CheckBox Content="Display results in console" IsChecked="{Binding Session.PersistentConsole}" />
                     </StackPanel>
                 </GroupBox>
             </StackPanel>
