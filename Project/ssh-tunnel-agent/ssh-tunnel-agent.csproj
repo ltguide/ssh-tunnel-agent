@@ -146,7 +146,7 @@
     <Compile Include="Tray\TrayToolTip.xaml.cs">
       <DependentUpon>TrayToolTip.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Tray\Converters\SessionStatusToContextMenuHeaderConverter.cs" />
+    <Compile Include="Tray\Converters\SessionStatusToCommandTextConverter.cs" />
     <Compile Include="Tray\Converters\SessionStatusToImageSourceConverter.cs" />
     <Compile Include="Data\Session.cs" />
     <Page Include="Windows\SessionConfigure.xaml">
@@ -191,11 +191,6 @@
     <EmbeddedResource Include="Embedded\Hardcodet.Wpf.TaskbarNotification.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Assets\SessionStatus_CONNECTED.png" />
-    <Resource Include="Assets\SessionStatus_ERROR.png" />
-    <Resource Include="Assets\SessionStatus_DISCONNECTED.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Embedded\Newtonsoft.Json.dll" />
   </ItemGroup>
   <ItemGroup>
@@ -226,7 +221,13 @@
     <EmbeddedResource Include="Embedded\Microsoft.Win32.TaskScheduler.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Assets\configure.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\SessionStatus_CONNECTED.png" />
     <Resource Include="Assets\SessionStatus_CONNECTING.png" />
+    <Resource Include="Assets\SessionStatus_DISCONNECTED.png" />
+    <Resource Include="Assets\SessionStatus_ERROR.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

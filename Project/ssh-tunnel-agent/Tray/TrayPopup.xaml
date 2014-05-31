@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:localTray="clr-namespace:ssh_tunnel_agent.Tray" 
              IsVisibleChanged="UserControl_IsVisibleChanged"
-             MinWidth="250">
+             MinWidth="250"
+             Name="popup">
     <Border
             Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" 
             BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" 
@@ -18,17 +19,17 @@
             <TextBlock FontWeight="Bold" Foreground="{DynamicResource {x:Static SystemColors.MenuTextBrushKey}}">SSH Tunnel Agent</TextBlock>
 
             <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="0,1,0,3" />
-            
+
             <TextBlock Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}">
-                Right/Double-click Session to control
+                Left-click the images to control sessions
             </TextBlock>
 
             <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="0,3,0,1" />
-            
-            <ListView Name="listSessions" ItemsSource="{Binding Sessions}" TargetUpdated="listSessions_TargetUpdated" BorderThickness="1" MouseDoubleClick="listSessions_MouseDoubleClick" Margin="0,3">
+
+            <ListView  Name="listSessions" ItemsSource="{Binding Sessions}" BorderThickness="1" MouseDoubleClick="listSessions_MouseDoubleClick" Margin="0,3" HorizontalContentAlignment="Stretch">
                 <ListView.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="{Binding PlacementTarget.SelectedItem.Status, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Converter={localTray:SessionStatusToContextMenuHeaderConverter}}" Command="{Binding TriggerSessionCommand}" CommandParameter="{Binding Path=PlacementTarget.SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}" />
+                        <MenuItem Header="{Binding PlacementTarget.SelectedItem.Status, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Converter={localTray:SessionStatusToCommandTextConverter}}" Command="{Binding TriggerSessionCommand}" CommandParameter="{Binding Path=PlacementTarget.SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}" />
                         <Separator />
                         <MenuItem Header="Configure" Command="{Binding ConfigureSessionCommand}" CommandParameter="{Binding Path=PlacementTarget.SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}" />
                     </ContextMenu>
@@ -42,6 +43,12 @@
                         </Style.Triggers>
                     </Style>
                 </ListView.Style>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+
                 <ListView.View>
                     <GridView>
                         <GridView.ColumnHeaderContainerStyle>
@@ -49,14 +56,30 @@
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </Style>
                         </GridView.ColumnHeaderContainerStyle>
+
                         <GridViewColumn>
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Image Source="{Binding Status, Converter={localTray:SessionStatusToImageSourceConverter}}" />
+                                    <Grid MinWidth="209">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="1*"  />
+                                            <ColumnDefinition Width="Auto"  />
+                                        </Grid.ColumnDefinitions>
+
+                                        <Button Grid.Column="0" Command="{Binding DataContext.TriggerSessionCommand, ElementName=popup}" CommandParameter="{Binding}" Margin="-8,-2,0,-3" Padding="4,0" BorderThickness="0" Cursor="Hand" ToolTip="{Binding Status, Converter={localTray:SessionStatusToCommandTextConverter}}" Background="{x:Null}">
+                                            <Image Source="{Binding Status, Converter={localTray:SessionStatusToImageSourceConverter}}" Width="14" />
+                                        </Button>
+
+                                        <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="4,0" VerticalAlignment="Center" />
+
+                                        <Button Grid.Column="3" Command="{Binding DataContext.ConfigureSessionCommand, ElementName=popup}" CommandParameter="{Binding}" Margin="0,-2,-10,-3" Padding="4,0" BorderThickness="0" Cursor="Hand" ToolTip="Configure" Background="{x:Null}">
+                                            <Image Source="/Assets/configure.png" Width="12" />
+                                        </Button>
+                                    </Grid>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn DisplayMemberBinding="{Binding Name, NotifyOnTargetUpdated=True}" />
                     </GridView>
                 </ListView.View>
             </ListView>

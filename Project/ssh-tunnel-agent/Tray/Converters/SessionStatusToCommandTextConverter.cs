@@ -6,11 +6,12 @@ using System.Windows.Markup;
 
 namespace ssh_tunnel_agent.Tray {
     [ValueConversion(typeof(SessionStatus), typeof(string))]
-    public class SessionStatusToContextMenuHeaderConverter : MarkupExtension, IValueConverter {
-        public SessionStatusToContextMenuHeaderConverter() { }
+    public class SessionStatusToCommandTextConverter : MarkupExtension, IValueConverter {
+        public SessionStatusToCommandTextConverter() { }
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             switch ((SessionStatus)value) {
+                case SessionStatus.CONNECTING:
                 case SessionStatus.CONNECTED:
                     return "Disconnect";
                 case SessionStatus.ERROR:
