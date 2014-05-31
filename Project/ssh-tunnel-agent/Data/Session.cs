@@ -246,8 +246,7 @@ namespace ssh_tunnel_agent.Data {
             _process.WaitForExit();
             _process.Close();
 
-            if (_sessionConsole != null)
-                _sessionConsole.TryClose();
+            _sessionConsole.TryClose();
 
             ConnectionAttempts = 0;
             Status = SessionStatus.DISCONNECTED;
@@ -257,7 +256,11 @@ namespace ssh_tunnel_agent.Data {
             if (!_processExit) {
                 Debug.WriteLine("exit: \"" + Name + "\"; " + _process.ExitCode);
 
-                if (_sessionConsole != null && (!SendCommands || !PersistentConsole))
+                if (SendCommands) {
+                    if (!PersistentConsole)
+                        _sessionConsole.TryClose();
+                }
+                else if (!StartShell)
                     _sessionConsole.TryClose();
 
                 if (_process.ExitCode == 0)

@@ -7,6 +7,7 @@ namespace ssh_tunnel_agent.Windows.Classes {
         STOREHOST,
         UPDATEHOST,
         PRIVATEKEY,
+        ERROR,
         ACCESSGRANTED
     }
 }

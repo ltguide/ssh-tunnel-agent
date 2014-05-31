@@ -190,14 +190,16 @@ namespace ssh_tunnel_agent.Windows {
                 if (Status != ConsoleStatus.ACCESSGRANTED) {
                     string[] lines = e.Data.Split(_splitby, StringSplitOptions.RemoveEmptyEntries);
 
-                    if (Array.IndexOf(lines, "Store key in cache? (y/n) ") >= 0)
-                        Status = ConsoleStatus.STOREHOST;
-                    else if (Array.IndexOf(lines, "Update cached key? (y/n, Return cancels connection) ") >= 0)
-                        Status = ConsoleStatus.UPDATEHOST;
-                    else if (Array.IndexOf(lines, "Access granted") >= 0) {
+                    if (Array.IndexOf(lines, "Access granted") >= 0) {
                         Status = ConsoleStatus.ACCESSGRANTED;
                         _session.Connected();
                     }
+                    else if (Array.IndexOf(lines, "Store key in cache? (y/n) ") >= 0)
+                        Status = ConsoleStatus.STOREHOST;
+                    else if (Array.IndexOf(lines, "Update cached key? (y/n, Return cancels connection) ") >= 0)
+                        Status = ConsoleStatus.UPDATEHOST;
+                    else if (Array.Find<string>(lines, line => line.StartsWith("FATAL ERROR:")) != null)
+                        Status = ConsoleStatus.ERROR;
                 }
 
                 StandardError += e.Data;
