@@ -12,8 +12,14 @@ namespace ssh_tunnel_agent {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    // app icon comes from https://www.iconfinder.com/icons/15459/network_receive_icon
+    // app icon https://www.iconfinder.com/icons/15459/network_receive_icon
     // Public Domain by Various - http://tango.freedesktop.org/The_People
+    //
+    // configure image https://www.iconfinder.com/icons/274895/
+    // Free for commercial use by Popcic
+    //
+    // connection status images, color replaced of http://openiconlibrary.sourceforge.net/gallery2/?./Icons/status/user-online.png
+    // no source or license listed
 
     public partial class App : Application {
         private static Mutex _mutex;
